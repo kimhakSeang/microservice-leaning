@@ -1,14 +1,12 @@
-#Start with base image containing java runtime
+#Java JDK
 FROM openjdk:17 as build
 
-# Information of owner or maintainer of image
-MAINTAINER pisethbank
+#Maintainer
+MAINTAINER Kimhak
 
-# Add the application's jar to the container
+#Add jar file to docker image
 COPY target/account-0.0.1-SNAPSHOT.jar account-0.0.1-SNAPSHOT.jar
 
-#Execute the application
-ENTRYPOINT ["java", "-jar","/account-0.0.1-SNAPSHOT.jar"]
 
-
-
+#Execute app
+ENTRYPOINT [ "java", "-jar", "account-0.0.1-SNAPSHOT.jar" ]
