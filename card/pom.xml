@@ -10,7 +10,7 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.piseth.bank</groupId>
-	<artifactId>card</artifactId>
+	<artifactId>loan</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>loan</name>
 	<description>Card project for Spring Boot</description>
