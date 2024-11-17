@@ -4,7 +4,6 @@ FROM openjdk:17 as build
 #Maintainer
 MAINTAINER Kimhak
 
-
 #Ad jar file to docker image
 COPY target/account-0.0.1-SNAPSHOT.jar account-0.0.1-SNAPSHOT.jar
 

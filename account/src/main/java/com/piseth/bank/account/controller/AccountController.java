@@ -38,7 +38,6 @@ public class AccountController {
 	public ResponseEntity<?> getAccounts(@PathVariable Long accountId){
 		return ResponseEntity.ok(AccountService.getById(accountId));
 	}
-	
-	
+
 
 }

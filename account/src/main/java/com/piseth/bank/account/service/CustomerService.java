@@ -2,6 +2,7 @@ package com.piseth.bank.account.service;
 
 import java.util.List;
 
+import com.piseth.bank.account.dto.CustomerDetailDTO;
 import com.piseth.bank.account.entity.Customer;
 
 public interface CustomerService {
@@ -9,5 +10,9 @@ public interface CustomerService {
 	
 	List<Customer> getCustomers();
 	
-	Customer getById(Long id);
+	Customer getById(Integer id);
+
+	CustomerDetailDTO getCustomerDetail(Integer customerId);
+
+	CustomerDetailDTO getCustomerDetailDefault(Integer customerId);
 }
