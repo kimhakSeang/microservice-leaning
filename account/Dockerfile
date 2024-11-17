@@ -5,10 +5,10 @@ FROM openjdk:17 as build
 MAINTAINER pisethbank
 
 # Add the application's jar to the container
-COPY target/account-0.0.1-SNAPSHOT.jar account-0.0.1-SNAPSHOT.jar
+COPY target/account_service-0.0.1-SNAPSHOT.jar account_service-0.0.1-SNAPSHOT.jar
 
 #Execute the application
-ENTRYPOINT ["java", "-jar","/account-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar","/account_service-0.0.1-SNAPSHOT.jar"]
 
 
 
