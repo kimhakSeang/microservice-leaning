@@ -12,11 +12,8 @@ import lombok.Data;
 @ConfigurationProperties(prefix = "account")
 @Data
 public class AccountServiceConfig {
-	private String msg;
-	private String buildVersion;
-	private Map<String, String> mailDetails;
-	private List<String> activeBranches;
-	
-	
-	// homework: set database properties
+		private String msg;
+		private String buildVersion;
+		private Map<String, String> mailDetail;
+		private List<String> activeBranchs; 
 }
