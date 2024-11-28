@@ -13,7 +13,6 @@ public class LoanMapper {
 		loan.setAmountPaid(dto.getAmountPaid());
 		loan.setCreateDate(dto.getCreateDate());
 		loan.setCustomerId(dto.getCustomerId());
-		loan.setLoanNumber(dto.getLoanNumber());
 		loan.setLoanType(dto.getLoanType());
 		loan.setOutstandingAmount(dto.getOutstandingAmount());
 		loan.setStartDate(dto.getStartDate());
