@@ -13,6 +13,6 @@ import lombok.NoArgsConstructor;
 public class Properties {
 	private String msg;
 	private String buildVersion;
-	private Map<String, String> mailDetails;
-	private List<String> activeBranches;
+	private Map<String, String> mailDetail;
+	private List<String> activeBranch; 
 }
