@@ -11,14 +11,14 @@ import javax.persistence.Table;
 
 import lombok.Data;
 
-@Entity(name = "loan")
-@Table
+@Entity
+@Table(name = "loan")
 @Data
 public class Loan {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	private Long customerId;
+	private Integer customerId;
 	private LocalDate startDate;
 	private String loanType;
 	private BigDecimal totalLoan;
