@@ -21,7 +21,7 @@ public class ConfigController {
 	public String getProperties() throws JsonProcessingException {
 		ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
 		Properties properties = new Properties(serviceConfig.getMsg(), serviceConfig.getBuildVersion(),
-				serviceConfig.getMailDetails(), serviceConfig.getActiveBranches());
+				serviceConfig.getMailDetail(), serviceConfig.getActiveBranchs());
 		String json = objectWriter.writeValueAsString(properties);
 		return json;
 	}
