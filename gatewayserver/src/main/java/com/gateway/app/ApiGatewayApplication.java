@@ -13,19 +13,21 @@ public class ApiGatewayApplication {
 		SpringApplication.run(ApiGatewayApplication.class, args);
 	}
 
-	@Bean
-	public RouteLocator routes(
-			RouteLocatorBuilder builder
-	) {
-		return builder.routes()
-				.route( p -> p.path("/learn/account/**")
-						.filters(f -> f.rewritePath("/learn/account/(?<segment>/?.*)", "/${segment}"))
-						.uri("lb://ACCOUNT")
-				)
-				.route( p -> p.path("/learn/loan/**")
-						.filters(f -> f.rewritePath("/learn/loan/(?<segment>/?.*)", "/${segment}"))
-						.uri("lb://LOAN")
-				).build();
-	}
+//	@Bean
+//	public RouteLocator routes(
+//			RouteLocatorBuilder builder
+//	) {
+//		return builder.routes()
+//				.route( p -> p.path("/learn/**")
+//						.filters(f -> f.rewritePath("/account/(?<segment>/?.*)", "/${segment}")
+//								.addResponseHeader("X-RESPONSE-TIME", "")
+//						)
+//						.uri("lb://ACCOUNT")
+//				)
+//				.route( p -> p.path("/learn/loan/**")
+//						.filters(f -> f.rewritePath("/learn/loan/(?<segment>/?.*)", "/${segment}"))
+//						.uri("lb://LOAN")
+//				).build();
+//	}
 
 }

@@ -12,7 +12,7 @@ public interface CustomerService {
 	
 	Customer getById(Integer id);
 
-	CustomerDetailDTO getCustomerDetail(Integer customerId);
+	CustomerDetailDTO getCustomerDetail(String connectorId, Integer customerId);
 
 	CustomerDetailDTO getCustomerDetailDefault(Integer customerId);
 }

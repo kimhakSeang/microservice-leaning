@@ -9,12 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.piseth.bank.account.dto.CustomerDTO;
 import com.piseth.bank.account.entity.Customer;
@@ -51,18 +46,20 @@ public class CustomerController {
 	}
 
 //	@CircuitBreaker(name = "CustomerDetailSupport", fallbackMethod = "getCustomerDetailDefault")
-	@Retry(name = "retryGetCustomerDetail", fallbackMethod = "getCustomerDetailDefault")
+//	@Retry(name = "retryGetCustomerDetail", fallbackMethod = "getCustomerDetailDefault")
 	@GetMapping("/detail/{customerId}")
-	public ResponseEntity<?> getCustomerDetail(@PathVariable Integer customerId){
-		log.error(">>>>>>>>>>>> CustomerDetail: Start process ... ");
-		return ResponseEntity.ok(customerService.getCustomerDetail(customerId));
+	public ResponseEntity<?> getCustomerDetail(@RequestHeader("connector-id") String connectorId, @PathVariable Integer customerId){
+		log.info(">>>>>>>>>>>> CustomerDetail: Start process of connectorId : "+ connectorId);
+		CustomerDetailDTO customerDetail = customerService.getCustomerDetail(connectorId, customerId);
+		log.info(">>>>>>>>>>>> CustomerDetail: Response Data: "+customerDetail);
+		return ResponseEntity.ok(customerDetail);
 	}
 
 	public ResponseEntity<?> getCustomerDetailDefault(@PathVariable Integer customerId, Throwable e){
 		return ResponseEntity.ok(customerService.getCustomerDetailDefault(customerId));
 	}
 
-	@RateLimiter(name = "greetingRateLimit", fallbackMethod = "sayHi")
+//	@RateLimiter(name = "greetingRateLimit", fallbackMethod = "sayHi")
 	@GetMapping(value = "greeting")
 	public ResponseEntity<String> sayHello(){
 		return ResponseEntity.ok("Hello Java");

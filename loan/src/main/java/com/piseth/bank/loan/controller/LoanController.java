@@ -35,8 +35,9 @@ public class LoanController {
 	}
 
 	@GetMapping(value = "/{customerId}")
-	public ResponseEntity<?> getLoanInfoByCustomerId(@PathVariable Integer customerId){
+	public ResponseEntity<?> getLoanInfoByCustomerId(@RequestHeader("connector-id")String connectorId, @PathVariable Integer customerId){
 		log.warn("GetLoanInfoByCustomerId: Start getLoanInfoByCustomerId of id = "+customerId);
+		log.warn("GetLoanInfoByCustomerId: connector-id = "+connectorId);
 		return ResponseEntity.ok(loanService.getLoanInfoByCustomerId( customerId));
 	}
 
