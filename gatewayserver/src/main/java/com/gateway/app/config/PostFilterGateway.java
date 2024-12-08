@@ -23,7 +23,6 @@ public class PostFilterGateway {
         return ( exchange, chain) -> chain.filter(exchange).then(
                 Mono.fromRunnable(()->{
                     String connectorId = gatewayUtility.getConnectorId(exchange);
-//                    exchange.getRequest().getHeaders().add(gatewayUtility.CONNECTOR_ID, connectorId);
                     exchange.getRequest().mutate().header(gatewayUtility.CONNECTOR_ID, connectorId);
                 })
         );
