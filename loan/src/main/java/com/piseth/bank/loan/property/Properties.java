@@ -1,11 +1,11 @@
-package com.piseth.bank.account.property;
-
-import java.util.List;
-import java.util.Map;
+package com.piseth.bank.loan.property;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor

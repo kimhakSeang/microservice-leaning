@@ -23,8 +23,8 @@ public class AccountConfigController {
 		Properties properties= new Properties(
 				serviceConfig.getMsg(), 
 				serviceConfig.getBuildVersion(),
-				serviceConfig.getMailDetail(),
-				serviceConfig.getActiveBranchs()
+				serviceConfig.getMailDetails(),
+				serviceConfig.getActiveBranches()
 				);
 		
 		ObjectWriter objectWriter  = new ObjectMapper().writer().withDefaultPrettyPrinter();

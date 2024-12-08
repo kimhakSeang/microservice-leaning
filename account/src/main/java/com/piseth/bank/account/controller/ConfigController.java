@@ -11,19 +11,19 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.piseth.bank.account.config.AccountServiceConfig;
 import com.piseth.bank.account.property.Properties;
 
-@RestController
-@RequestMapping("api/config")
+//@RestController
+//@RequestMapping("api/config")
 public class ConfigController {
-	@Autowired
-	private AccountServiceConfig serviceConfig;
-
-	@GetMapping("/properties")
-	public String getProperties() throws JsonProcessingException {
-		ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
-		Properties properties = new Properties(serviceConfig.getMsg(), serviceConfig.getBuildVersion(),
-				serviceConfig.getMailDetail(), serviceConfig.getActiveBranchs());
-		String json = objectWriter.writeValueAsString(properties);
-		return json;
-	}
+//	@Autowired
+//	private AccountServiceConfig serviceConfig;
+//
+//	@GetMapping("/properties")
+//	public String getProperties() throws JsonProcessingException {
+//		ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
+//		Properties properties = new Properties(serviceConfig.getMsg(), serviceConfig.getBuildVersion(),
+//				serviceConfig.getMailDetail(), serviceConfig.getActiveBranchs());
+//		String json = objectWriter.writeValueAsString(properties);
+//		return json;
+//	}
 
 }
