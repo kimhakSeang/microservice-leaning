@@ -1,29 +1,184 @@
-version: "3.8"
 services:
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+      - 5672:5672
+      - 15672:15672
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - learn_network
+
   configserver:
-    image: pisethbank/configserver:latest
+    image: kimhakseang/configserver:v2
+    mem_limit: 700m
+    container_name: configserver
+    restart: on-failure
+    healthcheck:
+      test: "curl --fail --silent localhost:8071/actuator/health | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    ports:
+      - "8000:8071"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - learn_network
+    environment:
+      SPRING_RABBITMQ_HOST: rabbitmq
+
+  posgres-db:
+    image: postgres
+    container_name: posgres-db
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=
+      - POSTGRES_DB=loan
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    ports:
+      - '5432:5432'
+    networks:
+      - learn_network
+    volumes:
+      - loan_data:/var/lib/postgresql/data
+  
+  mongo-db:
+    image: mongo:5.0
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    networks:
+      - learn_network
+    environment:
+      - MONGODB_INITDB_ROOT_USERNAME=user
+      - MONGODB_INITDB_ROOT_PASSWORD=pass
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s       # Check every 10 seconds
+      timeout: 5s         # Timeout if the check takes longer than 5 seconds
+      retries: 3          # Mark as unhealthy after 3 failed checks
+      start_period: 30s   # Wait 30 seconds before starting health checks
+
+  eurekaserver:
+    image: kimhakseang/eurekaserver:v2
     mem_limit: 700m
     ports:
-      - "8071:8071"
+      - "9000:9000"
     networks:
-      - pisethbanknet
-  account:
-    image: pisethbank/account:latest
-    mem_limit: 700m
-    ports:
-      - "8080:8080"
-    networks:
-      - pisethbanknet
-    depends_on: 
-      - configserver
+      - learn_network
+    depends_on:
+      configserver:
+        condition: service_healthy
     deploy:
       restart_policy:
         condition: on-failure
         delay: 15s
-        max_attempts: 3
+        max_attempts: 7
         window: 120s
     environment:
-      SPRING_PROFILES_ACTIVE: dev
-      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+      SPRING_PROFILE_ACTIVE: prod
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071
+
+  gateway:
+    image: kimhakseang/gatewayserver:v2
+    mem_limit: 700m
+    ports:
+      - "8072:8072"
+    networks:
+      - learn_network
+    depends_on:
+      configserver:
+          condition: service_healthy
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 15s
+        max_attempts: 7
+        window: 120s
+    environment:
+      SPRING_PROFILE_ACTIVE: prod
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:9000/eureka
+
+  account:
+    image: kimhakseang/account_service:v2
+    mem_limit: 700m
+    ports:
+      - "7000:8080"
+    networks:
+      - learn_network
+    depends_on:
+      configserver:
+        condition: service_healthy
+      mongo-db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILE_ACTIVE: prod
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:9000/eureka
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_DATA_MONGODB_HOST: mongo-db
+      SPRING_DATA_MONGODB_PORT: 27017
+      SPRING_DATA_MONGODB_DATABASE: account
+
+  loan:
+    image: kimhakseang/loan:v2
+    mem_limit: 700m
+    ports:
+      - "8095:8095"
+    networks:
+      - learn_network
+    depends_on:
+      configserver:
+        condition: service_healthy
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 5
+        window: 120s
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:9000/eureka
+      SPRING_DATASOURCE_URL: jdbc:postgresql://posgres-db:5432/loan
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PWD:
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071
+
+  loan-two:
+    image: kimhakseang/loan:v2
+    mem_limit: 700m
+    ports:
+      - "6000:8095"
+    networks:
+      - learn_network
+    depends_on:
+      configserver:
+        condition: service_healthy
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 5
+        window: 120s
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:9000/eureka
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071
+      SPRING_DATASOURCE_URL: jdbc:postgresql://posgres-db:5432/loan
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PWD:
+
 networks:
-  pisethbanknet:
+  learn_network:
+volumes:
+  loan_data:
