@@ -14,14 +14,14 @@ public class RoutesConfig {
             RouteLocatorBuilder builder
     ) {
         return builder.routes()
-                .route( p -> p.path("/learn/account/**")
-                        .filters(f -> f.rewritePath("/learn/account/(?<segment>/?.*)", "/${segment}")
+                .route( p -> p.path("/account/**")
+                        .filters(f -> f.rewritePath("/account/(?<segment>/?.*)", "/${segment}")
                                 .addResponseHeader("X-RESPONSE-TIME", "")
                         )
                         .uri("lb://ACCOUNT")
                 )
-                .route( p -> p.path("/learn/loan/**")
-                        .filters(f -> f.rewritePath("/learn/loan/(?<segment>/?.*)", "/${segment}"))
+                .route( p -> p.path("/loan/**")
+                        .filters(f -> f.rewritePath("/loan/(?<segment>/?.*)", "/${segment}"))
                         .uri("lb://LOAN")
                 ).build();
     }

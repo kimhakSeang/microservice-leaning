@@ -15,27 +15,6 @@ services:
     networks:
       - learn_network
 
-  configserver:
-    image: kimhakseang/configserver:v2
-    mem_limit: 700m
-    container_name: configserver
-    restart: on-failure
-    healthcheck:
-      test: "curl --fail --silent localhost:8071/actuator/health | grep UP || exit 1"
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 10s
-    ports:
-      - "8000:8071"
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-    networks:
-      - learn_network
-    environment:
-      SPRING_RABBITMQ_HOST: rabbitmq
-
   posgres-db:
     image: postgres
     container_name: posgres-db
@@ -69,10 +48,36 @@ services:
       timeout: 5s         # Timeout if the check takes longer than 5 seconds
       retries: 3          # Mark as unhealthy after 3 failed checks
       start_period: 30s   # Wait 30 seconds before starting health checks
+    
 
+  # CONFIG SERVER
+  configserver:
+    image: kimhakseang/configserver:v2
+    mem_limit: 700m
+    container_name: configserver
+    restart: on-failure
+    healthcheck:
+      test: "curl --fail --silent http://localhost:8071/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    ports:
+      - "8000:8071"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - learn_network
+    environment:
+      SPRING_RABBITMQ_HOST: rabbitmq
+
+  # EUREKA SERVER
   eurekaserver:
     image: kimhakseang/eurekaserver:v2
     mem_limit: 700m
+    healthcheck:
+      test: "curl --fail --silent http://localhost:9000/actuator/health/readiness | grep UP || exit 1"
     ports:
       - "9000:9000"
     networks:
@@ -80,16 +85,11 @@ services:
     depends_on:
       configserver:
         condition: service_healthy
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 15s
-        max_attempts: 7
-        window: 120s
     environment:
       SPRING_PROFILE_ACTIVE: prod
       SPRING_CONFIG_IMPORT: configserver:http://configserver:8071
 
+  # GATEWAY SERVER
   gateway:
     image: kimhakseang/gatewayserver:v2
     mem_limit: 700m
@@ -100,28 +100,27 @@ services:
     depends_on:
       configserver:
           condition: service_healthy
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 15s
-        max_attempts: 7
-        window: 120s
+      eurekaserver:
+        condition: service_healthy
     environment:
       SPRING_PROFILE_ACTIVE: prod
       SPRING_CONFIG_IMPORT: configserver:http://configserver:8071
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:9000/eureka
 
+  # ACCOUNT 
   account:
     image: kimhakseang/account_service:v2
     mem_limit: 700m
     ports:
-      - "7000:8080"
+      - "8081:8080"
     networks:
       - learn_network
     depends_on:
       configserver:
         condition: service_healthy
       mongo-db:
+        condition: service_healthy
+      eurekaserver:
         condition: service_healthy
     environment:
       SPRING_PROFILE_ACTIVE: prod
@@ -132,6 +131,7 @@ services:
       SPRING_DATA_MONGODB_PORT: 27017
       SPRING_DATA_MONGODB_DATABASE: account
 
+  # LOAN ONE
   loan:
     image: kimhakseang/loan:v2
     mem_limit: 700m
@@ -142,12 +142,8 @@ services:
     depends_on:
       configserver:
         condition: service_healthy
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 10s
-        max_attempts: 5
-        window: 120s
+      eurekaserver:
+        condition: service_healthy
     environment:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:9000/eureka
       SPRING_DATASOURCE_URL: jdbc:postgresql://posgres-db:5432/loan
@@ -155,6 +151,7 @@ services:
       SPRING_DATASOURCE_PWD:
       SPRING_CONFIG_IMPORT: configserver:http://configserver:8071
 
+  # LOAN TWO
   loan-two:
     image: kimhakseang/loan:v2
     mem_limit: 700m
@@ -165,12 +162,8 @@ services:
     depends_on:
       configserver:
         condition: service_healthy
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 10s
-        max_attempts: 5
-        window: 120s
+      eurekaserver:
+        condition: service_healthy
     environment:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:9000/eureka
       SPRING_CONFIG_IMPORT: configserver:http://configserver:8071

@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class CustomerServiceImpl implements CustomerService{
 	private static final Logger log = LoggerFactory.getLogger(CustomerServiceImpl.class);
 	private final CustomerRepository customerRepository;
-//	private final LoanService loanService;
+	private final LoanService loanService;
 	private final CustomerMapper customerMapper;
 
 	@Override
@@ -54,7 +54,7 @@ public class CustomerServiceImpl implements CustomerService{
 
 		List<LoanDTO> loanList = new ArrayList<>();
 		try{
-//			loanList = loanService.getLoanInfoByCustomerId(connectorId, customerId);
+			loanList = loanService.getLoanInfoByCustomerId(connectorId, customerId);
 		} catch (Exception e){
 			log.error(">>>>>>>>>>>>> Loan Service Unavailable");
 		}
