@@ -53,7 +53,6 @@ services:
   # CONFIG SERVER
   configserver:
     image: kimhakseang/configserver:v2
-    mem_limit: 700m
     container_name: configserver
     restart: on-failure
     healthcheck:
@@ -63,113 +62,76 @@ services:
       retries: 10
       start_period: 10s
     ports:
-      - "8000:8071"
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-    networks:
-      - learn_network
-    environment:
-      SPRING_RABBITMQ_HOST: rabbitmq
+      - "8071:8071"
+    extends:
+      file: common.yml
+      service: com-rabbit
 
   # EUREKA SERVER
   eurekaserver:
     image: kimhakseang/eurekaserver:v2
-    mem_limit: 700m
     healthcheck:
       test: "curl --fail --silent http://localhost:9000/actuator/health/readiness | grep UP || exit 1"
     ports:
       - "9000:9000"
-    networks:
-      - learn_network
-    depends_on:
-      configserver:
-        condition: service_healthy
-    environment:
-      SPRING_PROFILE_ACTIVE: dev
-      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071
+    extends:
+      file: common.yml
+      service: com-configserver
 
   # GATEWAY SERVER
   gateway:
     image: kimhakseang/gatewayserver:v2
-    mem_limit: 700m
     ports:
       - "8072:8072"
-    networks:
-      - learn_network
-    depends_on:
-      configserver:
-          condition: service_healthy
-      eurekaserver:
-        condition: service_healthy
-    environment:
-      SPRING_PROFILE_ACTIVE: prod
-      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:9000/eureka
+    extends:
+      file: common.yml
+      service: com-eurekaserver
 
   # ACCOUNT 
   account:
     image: kimhakseang/account_service:v2
-    mem_limit: 700m
     ports:
-      - "8081:8080"
-    networks:
-      - learn_network
+      - "8080:8080"
     depends_on:
-      configserver:
-        condition: service_healthy
       mongo-db:
         condition: service_healthy
-      eurekaserver:
-        condition: service_healthy
     environment:
-      SPRING_PROFILE_ACTIVE: prod
-      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:9000/eureka
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_DATA_MONGODB_HOST: mongo-db
       SPRING_DATA_MONGODB_PORT: 27017
       SPRING_DATA_MONGODB_DATABASE: account
+    extends:
+      file: common.yml
+      service: com-eurekaserver
+        # - com-eurekaserver
 
   # LOAN ONE
   loan:
     image: kimhakseang/loan:v2
-    mem_limit: 700m
     ports:
       - "8095:8095"
-    networks:
-      - learn_network
-    depends_on:
-      configserver:
-        condition: service_healthy
-      eurekaserver:
-        condition: service_healthy
     environment:
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:9000/eureka
       SPRING_DATASOURCE_URL: jdbc:postgresql://posgres-db:5432/loan
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PWD:
-      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071
+    extends:
+      file: common.yml
+      service: com-eurekaserver
+        # - com-eurekaserver
 
   # LOAN TWO
   loan-two:
     image: kimhakseang/loan:v2
-    mem_limit: 700m
     ports:
       - "6000:8095"
-    networks:
-      - learn_network
-    depends_on:
-      configserver:
-        condition: service_healthy
-      eurekaserver:
-        condition: service_healthy
     environment:
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:9000/eureka
-      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071
       SPRING_DATASOURCE_URL: jdbc:postgresql://posgres-db:5432/loan
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PWD:
+    extends:
+      file: common.yml
+      service: com-eurekaserver
+        # - com-eurekaserver
 
 networks:
   learn_network:
