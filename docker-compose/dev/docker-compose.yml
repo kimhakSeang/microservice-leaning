@@ -1,5 +1,6 @@
 services:
 
+  # RABBITMQ
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: 'rabbitmq'
@@ -12,9 +13,11 @@ services:
       timeout: 5s
       retries: 10
       start_period: 10s
-    networks:
-      - learn_network
+    extends:
+      file: common.yml
+      service: com-network
 
+  # POSTGRES
   posgres-db:
     image: postgres
     container_name: posgres-db
@@ -26,19 +29,19 @@ services:
       - POSTGRES_HOST_AUTH_METHOD=trust
     ports:
       - '5432:5432'
-    networks:
-      - learn_network
     volumes:
       - loan_data:/var/lib/postgresql/data
-  
+    extends:
+      file: common.yml
+      service: com-network
+
+  # MONGO    
   mongo-db:
     image: mongo:5.0
     container_name: mongodb
     restart: always
     ports:
       - "27017:27017"
-    networks:
-      - learn_network
     environment:
       - MONGODB_INITDB_ROOT_USERNAME=user
       - MONGODB_INITDB_ROOT_PASSWORD=pass
@@ -48,7 +51,9 @@ services:
       timeout: 5s         # Timeout if the check takes longer than 5 seconds
       retries: 3          # Mark as unhealthy after 3 failed checks
       start_period: 30s   # Wait 30 seconds before starting health checks
-    
+    extends:
+      file: common.yml
+      service: com-network
 
   # CONFIG SERVER
   configserver:
@@ -79,7 +84,7 @@ services:
       service: com-configserver
 
   # GATEWAY SERVER
-  gateway:
+  gateway-ms:
     image: kimhakseang/gatewayserver:v2
     ports:
       - "8072:8072"
@@ -103,7 +108,6 @@ services:
     extends:
       file: common.yml
       service: com-eurekaserver
-        # - com-eurekaserver
 
   # LOAN ONE
   loan:
@@ -117,7 +121,6 @@ services:
     extends:
       file: common.yml
       service: com-eurekaserver
-        # - com-eurekaserver
 
   # LOAN TWO
   loan-two:
@@ -131,7 +134,219 @@ services:
     extends:
       file: common.yml
       service: com-eurekaserver
-        # - com-eurekaserver
+
+  #---------------------------------------------------------
+  #-------------------EXTERNAL SERVICE----------------------
+  #---------------------------------------------------------
+
+  # READ Service
+  read:
+    image: grafana/loki:latest
+    command: "-config.file=/etc/loki/config.yaml -target=read"
+    ports:
+      - 3101:3100
+      - 7946
+      - 9095
+    volumes:
+      - ../../Observability/Loki/loki-config.yaml:/etc/loki/config.yaml
+    depends_on:
+      - minio
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3100/ready || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: &loki-dns
+      learn_network:
+        aliases:
+          - loki
+
+  #WRITE Service
+  write:
+    image: grafana/loki:latest
+    command: "-config.file=/etc/loki/config.yaml -target=write"
+    ports:
+      - 3102:3100
+      - 7946
+      - 9095
+    volumes:
+      - ../../Observability/Loki/loki-config.yaml:/etc/loki/config.yaml
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3100/ready || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      - minio
+    networks:
+      <<: *loki-dns
+
+  # Alloy
+  alloy:
+    image: grafana/alloy:latest
+    volumes:
+      - ../../Observability/Alloy/alloy-local-config.yaml:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command:  run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
+    ports:
+      - 12345:12345
+    depends_on:
+      - gateway
+    extends:
+      file: common.yml
+      service: com-network
+
+  # MiniO
+  minio:
+    image: minio/minio
+    entrypoint:
+      - sh
+      - -euc
+      - |
+        mkdir -p /data/loki-data && \
+        mkdir -p /data/loki-ruler && \
+        minio server /data
+    environment:
+      - MINIO_ROOT_USER=loki
+      - MINIO_ROOT_PASSWORD=supersecret
+      - MINIO_PROMETHEUS_AUTH_TYPE=public
+      - MINIO_UPDATE=off
+    ports:
+      - 9000
+    volumes:
+      - ./.data/minio:/data
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 15s
+      timeout: 20s
+      retries: 5
+    extends:
+      file: common.yml
+      service: com-network
+
+  # Grafana
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    depends_on:
+      - gateway
+    entrypoint:
+      - sh
+      - -euc
+      - |
+        mkdir -p /etc/grafana/provisioning/datasources
+        cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
+        apiVersion: 1
+        datasources:
+          - name: Loki
+            type: loki
+            access: proxy
+            url: http://gateway:3100
+            jsonData:
+              httpHeaderName1: "X-Scope-OrgID"
+            secureJsonData:
+              httpHeaderValue1: "tenant1"
+        EOF
+        /run.sh
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    extends:
+      file: common.yml
+      service: com-network
+
+  # Backend
+  backend:
+    image: grafana/loki:latest
+    volumes:
+      - ../../Observability/Loki/loki-config.yaml:/etc/loki/config.yaml
+    ports:
+      - "3100"
+      - "7946"
+    command: "-config.file=/etc/loki/config.yaml -target=backend -legacy-read-mode=false"
+    depends_on:
+      - gateway
+    extends:
+      file: common.yml
+      service: com-network
+    
+  # Grafana Gateway
+  gateway:
+    image: nginx:latest
+    depends_on:
+      - read
+      - write
+    entrypoint:
+      - sh
+      - -euc
+      - |
+        cat <<EOF > /etc/nginx/nginx.conf
+        user  nginx;
+        worker_processes  5;  ## Default: 1
+
+        events {
+          worker_connections   1000;
+        }
+
+        http {
+          resolver 127.0.0.11;
+
+          server {
+            listen             3100;
+
+            location = / {
+              return 200 'OK';
+              auth_basic off;
+            }
+
+            location = /api/prom/push {
+              proxy_pass       http://write:3100\$$request_uri;
+            }
+
+            location = /api/prom/tail {
+              proxy_pass       http://read:3100\$$request_uri;
+              proxy_set_header Upgrade \$$http_upgrade;
+              proxy_set_header Connection "upgrade";
+            }
+
+            location ~ /api/prom/.* {
+              proxy_pass       http://read:3100\$$request_uri;
+            }
+
+            location = /loki/api/v1/push {
+              proxy_pass       http://write:3100\$$request_uri;
+            }
+
+            location = /loki/api/v1/tail {
+              proxy_pass       http://read:3100\$$request_uri;
+              proxy_set_header Upgrade \$$http_upgrade;
+              proxy_set_header Connection "upgrade";
+            }
+
+            location ~ /loki/api/.* {
+              proxy_pass       http://read:3100\$$request_uri;
+            }
+          }
+        }
+        EOF
+        /docker-entrypoint.sh nginx -g "daemon off;"
+    ports:
+      - "3100:3100"
+    healthcheck:
+      test: ["CMD", "service", "nginx", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    extends:
+      file: common.yml
+      service: com-network
 
 networks:
   learn_network:
