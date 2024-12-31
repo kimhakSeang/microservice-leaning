@@ -78,7 +78,7 @@ services:
     healthcheck:
       test: "curl --fail --silent http://localhost:9000/actuator/health/readiness | grep UP || exit 1"
     ports:
-      - "9000:9000"
+      - "9001:9000"
     extends:
       file: common.yml
       service: com-configserver
@@ -139,7 +139,7 @@ services:
   #-------------------EXTERNAL SERVICE----------------------
   #---------------------------------------------------------
 
-  # READ Service
+  # READ
   read:
     image: grafana/loki:latest
     command: "-config.file=/etc/loki/config.yaml -target=read"
@@ -161,7 +161,7 @@ services:
         aliases:
           - loki
 
-  #WRITE Service
+  # WRITE
   write:
     image: grafana/loki:latest
     command: "-config.file=/etc/loki/config.yaml -target=write"
@@ -181,7 +181,7 @@ services:
     networks:
       <<: *loki-dns
 
-  # Alloy
+  # ALLOY
   alloy:
     image: grafana/alloy:latest
     volumes:
@@ -224,7 +224,7 @@ services:
       file: common.yml
       service: com-network
 
-  # Grafana
+  # GRAFANA
   grafana:
     image: grafana/grafana:latest
     environment:
@@ -258,6 +258,18 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    extends:
+      file: common.yml
+      service: com-network
+  
+  # PROMETHEUS
+  prometheus:
+    image: prom/prometheus:v2.45.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ../../Observability/Prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     extends:
       file: common.yml
       service: com-network
@@ -350,5 +362,6 @@ services:
 
 networks:
   learn_network:
+  # dev_learn_network:
 volumes:
   loan_data:
