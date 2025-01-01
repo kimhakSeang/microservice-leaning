@@ -34,5 +34,5 @@ jobs:
         run: mvn compile com.google.cloud.tools:jib-maven-plugin:build -Dimage=${{ vars.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
         working-directory: ./account
         env:
-          DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
+          DOCKER_USERNAME: kimhakseang
+          DOCKER_PASSWORD: dckr_pat_fkgFmTSsbZnu-CIuz9m5cWt0BvY
