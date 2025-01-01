@@ -17,6 +17,7 @@
 	<properties>
 		<java.version>17</java.version>
 		<spring-cloud.version>2021.0.8</spring-cloud.version>
+		<start-class>com.example.MainApplication</start-class>
 	</properties>
 
 	<dependencies>
@@ -140,6 +141,18 @@
 					<to>
 						<image>kimhakseang/${project.artifactId}:v2</image>
 					</to>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.3.0</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>${start-class}</mainClass>
+						</manifest>
+					</archive>
 				</configuration>
 			</plugin>
 		</plugins>
