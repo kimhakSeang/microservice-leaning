@@ -1,0 +1,33 @@
+services:
+
+  com-network:
+    mem_limit: 700m
+    networks:
+      - learn_network
+
+  com-rabbit:
+    extends: com-network
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      SPRING_RABBITMQ_HOST: rabbitmq
+    
+  com-configserver:
+    extends: com-network
+    depends_on:
+      configserver:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILE_ACTIVE: dev
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071
+
+  com-eurekaserver:
+    extends: com-configserver
+    depends_on:
+      eurekaserver:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILE_ACTIVE: dev
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:9000/eureka
+  
