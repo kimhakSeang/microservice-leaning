@@ -9,25 +9,29 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ vars.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      # Step 1: Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build and test
-        uses: docker/build-push-action@v6
+      # Step 2: Set up Java (JDK 17, for example)
+      - name: Set up JDK
+        uses: actions/setup-java@v3
         with:
-          target: test
-          load: true
+          distribution: 'temurin' # Use Temurin distribution
+          java-version: '17'
 
-      - name: Build and push
-        uses: docker/build-push-action@v6
+      # Step 3: Cache Maven dependencies
+      - name: Cache Maven packages
+        uses: actions/cache@v3
         with:
-          platforms: linux/amd64,linux/arm64
-          push: true
-          target: final
-          tags: ${{ vars.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      # Step 4: Build and push Docker image using Jib
+      - name: Build and push Docker image
+        run: mvn compile com.google.cloud.tools:jib-maven-plugin:build -Dimage=${{ vars.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
+        env:
+          DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
