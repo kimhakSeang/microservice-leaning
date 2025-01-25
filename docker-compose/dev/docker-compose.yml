@@ -71,6 +71,9 @@ services:
     extends:
       file: common.yml
       service: com-rabbit
+    environment:
+      SPRING_APPLICATION_NAME: "configserver"
+      OTEL_SERVICE_NAME: "configserver"
 
   # EUREKA SERVER
   eurekaserver:
@@ -82,6 +85,9 @@ services:
     extends:
       file: common.yml
       service: com-configserver
+    environment:
+      SPRING_APPLICATION_NAME: "eurekaserver"
+      OTEL_SERVICE_NAME: "eurekaserver"
 
   # GATEWAY SERVER
   gateway-ms:
@@ -91,6 +97,12 @@ services:
     extends:
       file: common.yml
       service: com-eurekaserver
+    environment:
+      SPRING_APPLICATION_NAME: "gatewayserver"
+      OTEL_SERVICE_NAME: "gatewayserver"
+      JAVA_TOOL_OPTIONS: "-javaagent:/app/libs/opentelemetry-javaagent-1.27.0.jar"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4317
+      OTEL_METRICS_EXPORTER: none
 
   # ACCOUNT 
   account:
@@ -105,6 +117,8 @@ services:
       SPRING_DATA_MONGODB_HOST: mongo-db
       SPRING_DATA_MONGODB_PORT: 27017
       SPRING_DATA_MONGODB_DATABASE: account
+      SPRING_APPLICATION_NAME: "account"
+      OTEL_SERVICE_NAME: "account"
     extends:
       file: common.yml
       service: com-eurekaserver
@@ -114,10 +128,13 @@ services:
     image: kimhakseang/loan:v2
     ports:
       - "8095:8095"
+      # - "6000:8095"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://posgres-db:5432/loan
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PWD:
+      SPRING_APPLICATION_NAME: "loan"
+      OTEL_SERVICE_NAME: "loan"
     extends:
       file: common.yml
       service: com-eurekaserver
@@ -131,6 +148,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://posgres-db:5432/loan
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PWD:
+      SPRING_APPLICATION_NAME: "loan"
+      OTEL_SERVICE_NAME: "loan"
     extends:
       file: common.yml
       service: com-eurekaserver
@@ -223,14 +242,26 @@ services:
     extends:
       file: common.yml
       service: com-network
+      
+  # TEMPO
+  tempo:
+    image: grafana/tempo:latest
+    container_name: tempo
+    command: -config.file /etc/tempo-config.yml
+    ports:
+      - "3200:3100"
+      - "4317:4317"
+    volumes:
+      - ../../Observability/Tempo/tempo.yml:/etc/tempo-config.yml
+    # environment:
+    #   - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317
+    extends:
+      file: common.yml
+      service: com-network
 
   # GRAFANA
   grafana:
     image: grafana/grafana:latest
-    environment:
-      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
-      - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
     depends_on:
       - gateway
     entrypoint:
@@ -253,6 +284,8 @@ services:
         /run.sh
     ports:
       - "3000:3000"
+    volumes:
+      - ../../Observability/Grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
     healthcheck:
       test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1" ]
       interval: 10s
@@ -261,6 +294,19 @@ services:
     extends:
       file: common.yml
       service: com-network
+    environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+
+      - GF_SMTP_ENABLED=true
+      - GF_SMTP_HOST=smtp.gmail.com:587
+      - GF_SMTP_USER=tthyu83@gmail.com
+      - GF_SMTP_PASSWORD=fdtv ikwf uiut vzrn
+      - GF_SMTP_FROM_ADDRESS=kimhakseang@example.com
+      - GF_SMTP_FROM_NAME=Grafana-Alert
+      - GF_SMTP_STARTTLS_POLICY=Yes
+
   
   # PROMETHEUS
   prometheus:
