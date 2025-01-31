@@ -6,10 +6,15 @@ import java.util.Optional;
 
 import com.piseth.bank.account.dto.CustomerDetailDTO;
 import com.piseth.bank.account.dto.LoanDTO;
+import com.piseth.bank.account.exception.APIException;
+import com.piseth.bank.account.exception.AppException;
+import com.piseth.bank.account.exception.ErrorDetial;
+import com.piseth.bank.account.exception.ResponseException;
 import com.piseth.bank.account.mapper.CustomerMapper;
 import com.piseth.bank.account.service.LoanService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.piseth.bank.account.entity.Customer;
@@ -46,11 +51,16 @@ public class CustomerServiceImpl implements CustomerService{
 	@Override
 	public CustomerDetailDTO getCustomerDetail(String connectorId, Integer customerId) {
 
+		Customer resultCustomerDetail = new Customer();
 		Optional<Customer> customer = customerRepository.findById(customerId);
-		if(customer.isEmpty()){
-//			throw new RuntimeException("Customer Not Found");
-			customer.orElse(new Customer());
-		}
+        resultCustomerDetail = customer
+									.orElseThrow(()->
+											new APIException(
+													ErrorDetial.NOT_FOUND,
+													HttpStatus.NOT_FOUND,
+													"Customer Detail not found: "+ customerId
+											)
+									);
 
 		List<LoanDTO> loanList = new ArrayList<>();
 		try{
@@ -61,7 +71,7 @@ public class CustomerServiceImpl implements CustomerService{
 
 
 		CustomerDetailDTO customerDetail = new CustomerDetailDTO();
-		customerDetail.setCustomer(customerMapper.toCustomerDTO(customer.get()));
+		customerDetail.setCustomer(customerMapper.toCustomerDTO(resultCustomerDetail));
         customerDetail.setLoanDTOList(loanList);
 
 		return customerDetail;
