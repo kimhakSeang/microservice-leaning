@@ -1,16 +1,48 @@
 services:
 
+  # KC_DB
+  keycloak-db:
+    image: postgres
+    container_name: postgres_db
+    ports:
+      - '5437:5432'
+    volumes:
+      - ./keycloack-db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak123
+    extends:
+      file: common.yml
+      service: com-network
+
+  # KEYCLOAK
   keycloak:
     image: quay.io/keycloak/keycloak:23.0.4
     container_name: keycloak
     ports:
       - "9080:8080"
     environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak123
+
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+
+      KC_LOG_LEVEL: info
+      KC_METRICS_ENABLED: true
+      KC_HEALTH_ENABLED: true
+
       KEYCLOAK_ADMIN: "admin"
       KEYCLOAK_ADMIN_PASSWORD: "admin"
-    command: "start-dev"
-    volumes:
-      - ./keycloak-data:/opt/keycloak/data
+    command: start-dev
+    depends_on:
+      - keycloak-db
+    # volumes:
+    #   - ./keycloak-data:/opt/keycloak/data
     extends:
       file: common.yml
       service: com-network
@@ -35,9 +67,9 @@ services:
       service: com-network
 
   # POSTGRES
-  posgres-db:
+  postgres-db:
     image: postgres
-    container_name: posgres-db
+    container_name: postgres-db
     restart: always
     environment:
       - POSTGRES_USER=postgres
@@ -148,7 +180,7 @@ services:
       - "8095:8095"
       # - "6000:8095"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://posgres-db:5432/loan
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/loan
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PWD:
       SPRING_APPLICATION_NAME: "loan"
@@ -163,7 +195,7 @@ services:
     ports:
       - "6000:8095"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://posgres-db:5432/loan
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/loan
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PWD:
       SPRING_APPLICATION_NAME: "loan"
