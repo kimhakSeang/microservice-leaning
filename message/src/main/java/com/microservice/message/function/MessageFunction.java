@@ -12,9 +12,9 @@ import java.util.function.Function;
 public class MessageFunction {
 
     @Bean
-    public Function<CustomerMessageDto, String> email(){
+    public Function<CustomerMessageDto, CustomerMessageDto> email(){
         log.info("Start sending message to email....");
-        return CustomerMessageDto::getEmail;
+        return e -> e;
     }
 
     @Bean
