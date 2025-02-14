@@ -17,4 +17,10 @@ public class MessageFunction {
         return CustomerMessageDto::getEmail;
     }
 
+    @Bean
+    public Function<CustomerMessageDto, String> sms(){
+        log.info("Start sending message to sms....");
+        return CustomerMessageDto::getMobileNumber;
+    }
+
 }
