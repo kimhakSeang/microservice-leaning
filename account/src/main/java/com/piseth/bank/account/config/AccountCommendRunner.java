@@ -22,21 +22,23 @@ public class AccountCommendRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        Customer customer = new Customer();
-        customer.setCustomerId(1);
-        customer.setName("Kimhak");
-        customer.setCreateDate(LocalDate.now());
-        customer.setEmail("Kimhak@gmail.com");
-        customer.setMobileNumber("081531077");
-        customerService.save(customer);
 
-        Account account = new Account();
-        account.setAccountNumber(1L);
-        account.setAccountType("Saving");
-        account.setCreateDate(LocalDate.now());
-        account.setCustomer(customer);
-        account.setBranchAddress("Kandal");
-        accountService.save(account);
-        log.info("Account Created");
+//
+//        Customer customer = new Customer();
+//        customer.setCustomerId(1);
+//        customer.setName("Kimhak");
+//        customer.setCreateDate(LocalDate.now());
+//        customer.setEmail("Kimhak@gmail.com");
+//        customer.setMobileNumber("081531077");
+//        customerService.save(customer);
+//
+//        Account account = new Account();
+//        account.setAccountNumber(1L);
+//        account.setAccountType("Saving");
+//        account.setCreateDate(LocalDate.now());
+//        account.setCustomer(customer);
+//        account.setBranchAddress("Kandal");
+//        accountService.save(account);
+//        log.info("Account Created");
     }
 }

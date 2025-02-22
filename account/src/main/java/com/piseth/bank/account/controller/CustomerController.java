@@ -29,10 +29,8 @@ public class CustomerController {
 	private CustomerMapper customerMapper;
 	
 	@PostMapping
-	public ResponseEntity<?> saveCustomer(@RequestBody CustomerDTO dto){
-		Customer customer = customerMapper.toCustomer(dto);
-		customer = customerService.save(customer);
-		return ResponseEntity.ok(customer);
+	public ResponseEntity<?> saveCustomer(@RequestBody Customer customer){
+		return ResponseEntity.ok(customerService.save(customer));
 	}
 	
 	@GetMapping

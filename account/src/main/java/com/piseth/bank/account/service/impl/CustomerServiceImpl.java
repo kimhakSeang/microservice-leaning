@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.piseth.bank.account.config.KafkaTopic;
 import com.piseth.bank.account.dto.CustomerDetailDTO;
 import com.piseth.bank.account.dto.LoanDTO;
 import com.piseth.bank.account.exception.APIException;
@@ -30,10 +31,15 @@ public class CustomerServiceImpl implements CustomerService{
 	private final CustomerRepository customerRepository;
 	private final LoanService loanService;
 	private final CustomerMapper customerMapper;
+	private final KafkaTopic kafkaTopic;
 
 	@Override
 	public Customer save(Customer customer) {
-		return customerRepository.save(customer);
+		 customerRepository.save(customer);
+		 // Send Topic
+		 kafkaTopic.sendCommunication(customer);
+
+		 return customer;
 	}
 
 	@Override
