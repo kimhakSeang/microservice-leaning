@@ -15,6 +15,7 @@ public class MessageFunction {
     public Function<CustomerMessageDto, CustomerMessageDto> email(){
         log.info("Start sending message to email....");
         return e -> {
+            log.info("Send email to customer: {}", e);
 //            if(e.getEmail().equals("hak@gmail.com")){
 //                throw new RuntimeException("Test");
 //            }
@@ -23,9 +24,12 @@ public class MessageFunction {
     }
 
     @Bean
-    public Function<CustomerMessageDto, String> sms(){
+    public Function<CustomerMessageDto, Integer> sms(){
         log.info("Start sending message to sms....");
-        return CustomerMessageDto::getMobileNumber;
+        return cust -> {
+            log.info("Consume Successfully: "+ cust.getCustomerId());
+            return cust.getCustomerId();
+        };
     }
 
 }

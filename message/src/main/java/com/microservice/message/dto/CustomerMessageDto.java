@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class CustomerMessageDto {
-    private int id;
+    private Integer customerId;
     private String name;
     private String email;
     private String mobileNumber;

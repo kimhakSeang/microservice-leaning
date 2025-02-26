@@ -15,4 +15,6 @@ public interface CustomerService {
 	CustomerDetailDTO getCustomerDetail(String connectorId, Integer customerId);
 
 	CustomerDetailDTO getCustomerDetailDefault(Integer customerId);
+
+	void  updateCustomerCommunication(Integer id);
 }

@@ -1,4 +1,4 @@
-package com.piseth.bank.account.config;
+package com.piseth.bank.account.kafka;
 
 import com.piseth.bank.account.dto.CustomerDTO;
 import com.piseth.bank.account.entity.Customer;

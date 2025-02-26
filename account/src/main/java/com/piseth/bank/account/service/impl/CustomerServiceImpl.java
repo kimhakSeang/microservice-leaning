@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import com.piseth.bank.account.config.KafkaTopic;
+import com.piseth.bank.account.kafka.KafkaTopic;
 import com.piseth.bank.account.dto.CustomerDetailDTO;
 import com.piseth.bank.account.dto.LoanDTO;
 import com.piseth.bank.account.exception.APIException;
-import com.piseth.bank.account.exception.AppException;
 import com.piseth.bank.account.exception.ErrorDetial;
-import com.piseth.bank.account.exception.ResponseException;
 import com.piseth.bank.account.mapper.CustomerMapper;
 import com.piseth.bank.account.service.LoanService;
 import org.slf4j.Logger;
@@ -35,11 +33,11 @@ public class CustomerServiceImpl implements CustomerService{
 
 	@Override
 	public Customer save(Customer customer) {
-		 customerRepository.save(customer);
-		 // Send Topic
-		 kafkaTopic.sendCommunication(customer);
+		Customer result = customerRepository.save(customer);
+		// Send Topic
+		 kafkaTopic.sendCommunication(result);
 
-		 return customer;
+		 return result;
 	}
 
 	@Override
@@ -49,7 +47,6 @@ public class CustomerServiceImpl implements CustomerService{
 
 	@Override
 	public Customer getById(Integer id) {
-		// TODO Auto-generated method stub
 		return customerRepository.findById(id).
 				orElseThrow(() -> new RuntimeException("Customer not found"));
 	}
@@ -97,6 +94,14 @@ public class CustomerServiceImpl implements CustomerService{
 		customerDetail.setLoanDTOList(null);
 
 		return customerDetail;
+	}
+
+	@Override
+	public void updateCustomerCommunication(Integer id){
+		log.info("Update Customer Communication: "+ id);
+		Customer customer = getById(id);
+		customer.setAlreadySent(true);
+		customerRepository.save(customer);
 	}
 
 }
