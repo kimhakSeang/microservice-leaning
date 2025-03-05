@@ -5,13 +5,13 @@ services:
     networks:
       - learn_network
 
-  com-rabbit:
-    extends: com-network
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-    environment:
-      SPRING_RABBITMQ_HOST: rabbitmq
+  # com-rabbit:
+  #   extends: com-network
+  #   depends_on:
+  #     rabbitmq:
+  #       condition: service_healthy
+  #   environment:
+  #     SPRING_RABBITMQ_HOST: rabbitmq
 
     
   com-configserver:

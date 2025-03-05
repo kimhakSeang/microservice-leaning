@@ -1,5 +1,43 @@
 services:
 
+  # KAFKA-Broker
+  kafka:
+    image: docker.io/bitnami/kafka:3.5
+    container_name: kafka
+    ports:
+      - 9092:9092
+    # volumes:
+    #   - kafka_data:/bitnami
+    environment:
+      # KRaft settings
+      KAFKA_CFG_NODE_ID: 0
+      KAFKA_CFG_PROCESS_ROLES: controller,broker
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 0@kafka:9093
+      # Listeners
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://:9092
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+    extends:
+        file: common.yml
+        service: com-network
+
+# KAFKA UI
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - 8082:8080
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    # volumes:
+    #   - /tmp/config.yml:/config.yml
+    extends:
+      file: common.yml
+      service: com-network
+
   # KC_DB
   keycloak-db:
     image: postgres
@@ -47,24 +85,6 @@ services:
       file: common.yml
       service: com-network
       start_period: 10s
-    
-
-  # RABBITMQ
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    container_name: 'rabbitmq'
-    ports:
-      - 5672:5672
-      - 15672:15672
-    healthcheck:
-      test: rabbitmq-diagnostics check_port_connectivity
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 10s
-    extends:
-      file: common.yml
-      service: com-network
 
   # POSTGRES
   postgres-db:
@@ -90,7 +110,7 @@ services:
     container_name: mongodb
     restart: always
     ports:
-      - "27017:27017"
+      - "27018:27017"
     environment:
       - MONGODB_INITDB_ROOT_USERNAME=user
       - MONGODB_INITDB_ROOT_PASSWORD=pass
@@ -119,7 +139,7 @@ services:
       - "8071:8071"
     extends:
       file: common.yml
-      service: com-rabbit
+      service: com-network
     environment:
       SPRING_APPLICATION_NAME: "configserver"
       OTEL_SERVICE_NAME: "configserver"
@@ -163,15 +183,27 @@ services:
       mongo-db:
         condition: service_healthy
     environment:
-      SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_DATA_MONGODB_HOST: mongo-db
       SPRING_DATA_MONGODB_PORT: 27017
       SPRING_DATA_MONGODB_DATABASE: account
       SPRING_APPLICATION_NAME: "account"
       OTEL_SERVICE_NAME: "account"
+      SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: "kafka:9092"
     extends:
       file: common.yml
       service: com-eurekaserver
+
+  # MESSAGE
+  message:
+    image: kimhakseang/message:v2
+    container_name: message-ms
+    ports:
+      - 8010:8010
+    environment:
+      SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: "kafka:9092"
+    extends:
+      file: common.yml
+      service: com-network   
 
   # LOAN ONE
   loan:
