@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+# The kind field defines the type of Kubernetes object
+kind: Deployment  
+metadata:
+  name: configserver-deployment
+  labels:
+    app: configserver
+spec:
+  replicas: 1
+  # Selector: The service routes traffic to pods with the label app: configserver.
+  selector: 
+    matchLabels:
+      app: configserver
+  template:
+    metadata:
+      labels:
+        app: configserver
+    spec:
+      containers:
+        - name: configserver
+          image: kimhakseang/configserver:v3
+          env:
+          - name: CONFIGSERVER_APPLICATION_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: kimhakseang-configmap
+                key: CONFIGSERVER_APPLICATION_NAME
+          ports:
+            - containerPort: 8071
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: configserver
+spec:
+  selector:
+    app: configserver
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 8071
+      targetPort: 8071

@@ -119,7 +119,7 @@
 				<version>3.3.2</version>
 				<configuration>
 					<to>
-						<image>kimhakseang/${project.artifactId}:v2</image>
+						<image>kimhakseang/${project.artifactId}:v3</image>
 					</to>
 				</configuration>
 			</plugin>

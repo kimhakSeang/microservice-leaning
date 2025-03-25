@@ -10,7 +10,7 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.piseth.bank</groupId>
-	<artifactId>account_service</artifactId>
+	<artifactId>account</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>account</name>
 	<description>Account project for Spring Boot</description>
@@ -148,7 +148,7 @@
 				<version>3.3.2</version>
 				<configuration>
 					<to>
-						<image>kimhakseang/${project.artifactId}:v2</image>
+						<image>kimhakseang/${project.artifactId}:v3</image>
 					</to>
 				</configuration>
 			</plugin>
