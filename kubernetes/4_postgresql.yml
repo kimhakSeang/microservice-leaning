@@ -1,0 +1,154 @@
+# # New 
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: postgres
+#   labels:
+#     app: postgres
+#     group: db
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: postgres
+#   template:
+#     metadata:
+#       labels:
+#         app: postgres
+#         type: db
+#     spec:
+#       volumes:                         # indicates which PVC are available for this Deployment
+#         - name: "postgres-storage"
+#           hostPath:
+#             path: "/Users/user/Documents/docker/osdsk8s/postgres-data"
+#             type: Directory
+#       containers:
+#         - name: postgres
+#           image: postgres:16
+#           ports:
+#             - containerPort: 5432
+#           envFrom:
+#           - configMapRef:
+#               name: kimhakseang-configmap
+#           volumeMounts:                             # indicates which Volume (from spec.template.spec.volumes) should be used
+#             - name: postgres-storage                # name of the Volume
+#               mountPath: /var/lib/postgresql/data   # path inside the container
+#           resources:
+#             limits:
+#               memory: "256Mi"
+#               cpu: "500m"
+
+# ---
+# # Service
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: postgres
+#   labels:
+#     group: db
+# spec:
+#   type: ClusterIP
+#   selector:
+#     app: postgres
+#   ports:
+#     - port: 5432
+#       targetPort: 5432
+
+# OLD 
+
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-secret
+type: Opaque
+data:
+  POSTGRES_DB: bG9hbg==                      
+  POSTGRES_USER: cG9zdGdyZXM=            # "postgres" (Base64-encoded)
+  POSTGRES_PASSWORD: cG9zdGdyZXM=                    # "" (Base64-encoded)
+  POSTGRES_HOST_AUTH_METHOD: dHJ1c3Q=
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-volume
+  labels:
+    type: local
+    app: postgres
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /data/postgresql
+
+--- 
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-volume-claim
+  labels:
+    app: postgres
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres  # Use PostgreSQL 15
+          ports:
+            - containerPort: 5432
+          envFrom:
+          - configMapRef:
+              name: kimhakseang-configmap
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-storage
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-volume-claim
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+spec:
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 5433
+      targetPort: 5432
+  selector:
+    app: postgres
+  type: LoadBalancer
+
+

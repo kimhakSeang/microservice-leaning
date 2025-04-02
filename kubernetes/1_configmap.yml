@@ -3,23 +3,36 @@ kind: ConfigMap
 metadata:
   name: kimhakseang-configmap
 data:
-  SPRING_PROFILES_ACTIVE: default
+  SPRING_PROFILES_ACTIVE: dev
   SPRING_CONFIG_IMPORT: "configserver:http://configserver:8071/"
-  EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eurekaserver:9001/eureka/"
+  EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "http://eurekaserver:9000/eureka/"
   CONFIGSERVER_APPLICATION_NAME: configserver
   EUREKA_APPLICATION_NAME: eurekaserver
   ACCOUNT_APPLICATION_NAME: account
   LOAN_APPLICATION_NAME: loan
   CARD_APPLICATION_NAME: card
   GATEWAY_APPLICATION_NAME: gatewayserver
+  MESSAGE_APPLICATION_NAME: message
+
+  # KEYCLOAK
   KEYCLOAK_ADMIN: admin
   KEYCLOAK_ADMIN_PASSWORD: admin
   SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI: "http://keycloak:9080/realms/master/protocol/openid-connect/certs"
+
+  # POSTGRES DB
+  POSTGRES_DB: loan
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  POSTGRES_HOST_AUTH_METHOD: trust
+  
+  # POSTGRES Connection
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5433/loan"
+  SPRING_DATASOURCE_USERNAME: postgres
+  SPRING_DATASOURCE_PWD: postgres
+
+    # MONGO
   MONGODB_INITDB_ROOT_USERNAME: user
   MONGODB_INITDB_ROOT_PASSWORD: pass
-  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres-db:5432/loan"
-  SPRING_DATASOURCE_USERNAME: postgres
-  SPRING_DATASOURCE_PWD:
   SPRING_DATA_MONGODB_HOST: mongo-db
   SPRING_DATA_MONGODB_PORT: "27017"
   SPRING_DATA_MONGODB_DATABASE: account

@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment  
+metadata:
+  name: loan-deployment
+  labels:
+    app: loan
+spec:
+  replicas: 1
+  # Selector: The service routes traffic to pods with the label app: configserver.
+  selector: 
+    matchLabels:
+      app: loan
+  template:
+    metadata:
+      labels:
+        app: loan
+    spec:
+      containers:
+      - name: loan
+        image: kimhakseang/loan:v3
+        envFrom:
+          - configMapRef:
+              name: kimhakseang-configmap
+        ports:
+        - containerPort: 8095
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loan
+spec:
+  selector:
+    app: loan
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 8095
+      targetPort: 8095

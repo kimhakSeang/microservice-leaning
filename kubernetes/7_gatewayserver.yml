@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment  
+metadata:
+  name: gatewayserver-deployment
+  labels:
+    app: gatewayserver
+spec:
+  replicas: 1
+  # Selector: The service routes traffic to pods with the label app: configserver.
+  selector: 
+    matchLabels:
+      app: gatewayserver
+  template:
+    metadata:
+      labels:
+        app: gatewayserver
+    spec:
+      containers:
+      - name: gatewayserver
+        image: kimhakseang/gatewayserver:v3
+        envFrom:
+          - configMapRef:
+              name: kimhakseang-configmap
+        ports:
+        - containerPort: 8072
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gatewayserver
+spec:
+  selector:
+    app: gatewayserver
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 8072
+      targetPort: 8072
