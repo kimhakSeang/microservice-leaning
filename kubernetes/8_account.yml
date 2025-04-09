@@ -18,32 +18,9 @@ spec:
       containers:
       - name: account
         image: kimhakseang/account:v3
-        env:
-          - name: ACCOUNT_APPLICATION_NAME
-            valueFrom:
-              configMapKeyRef:
-                name: kimhakseang-configmap
-                key: ACCOUNT_APPLICATION_NAME
-          - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI
-            valueFrom:
-              configMapKeyRef:
-                name: kimhakseang-configmap
-                key: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI
-          - name: SPRING_DATA_MONGODB_HOST
-            valueFrom:
-              configMapKeyRef:
-                name: kimhakseang-configmap
-                key: SPRING_DATA_MONGODB_HOST
-          - name: SPRING_DATA_MONGODB_PORT
-            valueFrom:
-              configMapKeyRef:
-                name: kimhakseang-configmap
-                key: SPRING_DATA_MONGODB_PORT
-          - name: SPRING_DATA_MONGODB_DATABASE
-            valueFrom:
-              configMapKeyRef:
-                name: kimhakseang-configmap
-                key: SPRING_DATA_MONGODB_DATABASE
+        envFrom:
+          - configMapRef:
+              name: kimhakseang-configmap
         ports:
         - containerPort: 8080
 ---
