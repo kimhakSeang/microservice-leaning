@@ -27,8 +27,8 @@ public class MessageFunction {
     public Function<CustomerMessageDto, Integer> sms(){
         log.info("Start sending message to sms....");
         return cust -> {
-            log.info("Consume Successfully: "+ cust.getCustomerId());
-            return cust.getCustomerId();
+            log.info("Consume Successfully: "+ cust.getId());
+            return cust.getId();
         };
     }
 
