@@ -1,0 +1,21 @@
+------------- Helm Cmd ---------------
+> Install helm:
+	scoop install helm
+
+> Initialize a Helm Chart Repository
+	helm repo add bitnami https://charts.bitnami.com/bitnami
+	
+> Search Bitnami Repo:
+	helm search repo bitnami
+	
+> setup wordpress:
+  helm install new-app bitnami/wordpress
+	
+> setup keycloak:
+  helm install keycloak bitnami/keycloak
+  
+> List [realease-name]
+  helm list
+
+> Check helm realease-name status:
+  helm status <release-name>

@@ -1,0 +1,912 @@
+Cloud-native application are a collection of small, independent, are losely coupled services.
+> Principle of Coloud Native Service:
+ 1. Microservice
+ 2. Containers
+ 3. Devops
+ 4. Continues Delivery: up to date with new technology
+9
+> 12 factor.net: Best practice for development cloud-native
+   - 1. Codebase: each service have single codebase
+   - 2. Dependencies: explicitly declare the dependencies
+   - 3. Config: independent of configuration
+   - 4. Backing service: swape connection without changing codebase
+   - 5. Build, Release and Run: binding config with building stage(codebase) to release stage
+   - 6. Processes: more stateless processes( don't store in db). Ex: Session
+   - 7. Port Binding: each microservice shoud be self-contained with its
+                      interfaces and functionality exposed on it own port.
+   - 8. Concurrency: Services scale out across a large number of small identical processes
+        - Vertical scaling(Scale up): refer increase hardwares
+		- Horizental Scaling(Scale out): add more instances of application
+   - 9. Disposability: services instancesshould be disposable
+   - 10. Dev/Prod parity: keep environment across the app life cycle as similar as possible.
+   - 11. Logs: collect of log in microservice to centalize log(logstash)
+   - 12. Admin Process: tasks one-off process. The scripts can excute all the the administrative 
+         tasks without having to do it manually.
+ 
+> Beviors of could -native:
+  1. Predicateble behavoir 
+  2. OS Abstaction
+  3. Right size capacity & Independent
+  4. Continue develipy
+  5. Repid recovery & automated scalability
+                     
+> Three challenge of Microservice:
+  I. Challenge one:
+     1. Size of Microservice
+     2. Scop of Microservice
+  II. Challenge two:
+     1. Deployment
+     2. Portability
+     3. Scalability
+  III. Challenge Three:
+     1. Separation of Config/Properties
+     2. Inject Config/Properties
+     3. Maintain of Config/Proprties
+  IV. Challenge Four:
+     1. Service locate each other inside a network
+	 2. new serice instance enter into network
+	 3. Load Balance, Info sharing between microservice instance
+ 
+> Config Spring Cloud:
+  1. Add @EnableConfigServer
+  2. Create configuration file of each environment
+  3. Set congfig in file application.properties
+
+
+Week_8: Spring Cloud
+	> Set up Spring Cloud
+	1. Add Dependencies
+	2. Set up properties
+	3. Create configuration class
+
+
+Week_10:
+	> Refresh config properties:
+	  - main -> @RefreshScrope
+	  - property file -> management.endpoints.web.exposure.include=*
+
+	> Check all exposeure endpoints:
+	http://localhost:8080/actuator
+
+	> Encrypt & Decrypt
+	  - encrypt.key -> .properties 
+		+ Auto generate endpoints for encrypt(http://localhost:8071/encrypt) and decrypt(http://localhost:8071/decrypt)
+	  - {cipher}[encrypt_value]
+		+ Auto decrypt when all api
+
+Week_11: Challenge 4
+	
+	> Network connection each service:
+	  - A Cental Server( or Server) that maintain a global view of addresses
+	  
+    > New instance into network:
+	  - Microservice/client that connect to cental server to register thier address when they start & ready
+
+	> Loan balance, info sharing between microservice instance:
+	  -  Microservice/client need to send their heartbeats at regular interval
+	
+	> Service discovery and registation:
+	  + Tranditional have static network location
+	  + Microservice used dynamic ip address
+
+	> Client Side Load Balancing:
+	  1. Client side cache information(IP, hartbeat, ...) about service via Service Discovery
+	  2. If the client side was cache service IP, it use it without call to Service Discovery.
+	  3. Service discovery nodes communicate with each other about new services, health of service etc.
+	  4. The period of time, if the service don't send hartbeat so Service Discovery Agent will remove it IP.
+	> Spring Cloud commponents:
+	  - Spring Cloud Netflix's Eureka: will act as Service Discovery
+	  - Spring Cloud Loand Balancer library use for Client Side Load Balancing
+	  - Netflix Feign client to loop up for a service between microservices
+	  
+	  
+	> Keyword:
+	  - Single piont of failure: fail one service make other fail also
+	  - Centralized chokepoints:
+      - Agent: service discovery node 1, service discovery node 2, ...
+	  - Resilient:  A service is down but other sevice still work normal
+	  - Round robin: 
+	
+	  
+    > Noted:
+      - Client call to each service via:
+       	+ Tranditional using IP
+		+ Microservice using Logical Name
+      - Every service discovery node got the same info when have new image register.
+	  - if service discovery will remove IP of service that don't send hartbeat.
+
+Week_12: Erekaserver
+    > Eureka is a part of the Spring Cloud Netflix project and it provides the mechanism to register and discover the services
+    > Port:
+	    - Config: 8070 -- Work
+		- Account: 8080 -- Work
+		- Card: 8090 --Work
+		- Loan: 8095 --Work
+		
+	> Set up Eureka Server:
+	  1. Create Spring boot project 
+	  2. add eureka dependencies
+	  3. add anotation @EnableEurekaServer
+	> Register service to Eureka Server:
+	  1. Add dependency
+	    <spring-cloud.version>2021.0.8</spring-cloud.version>
+	  
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+		
+		<dependencyManagement>
+			<dependencies>
+				<dependency>
+					<groupId>org.springframework.cloud</groupId>
+					<artifactId>spring-cloud-dependencies</artifactId>
+					<version>${spring-cloud.version}</version>
+					<type>pom</type>
+					<scope>import</scope>
+				</dependency>
+			</dependencies>
+		</dependencyManagement>
+		
+	  2. Add config properties
+		eureka.instance.preferIpAddress=true
+		eureka.client.registerWithEureka=true
+		eureka.client.fetchRegistry=true
+		eureka.client.serviceUrl.defaultZone=http://localhost:9001/eureka/
+	  3. run cmd clean and run:
+	    mvn clean package
+		mvn spring-boot:run
+		
+	> Add actuator info
+	  1. Add Actuator Dependency
+	  2. add application.proterties
+		management.endpoints.web.exposure.include=*
+		info.app.name=Account Service
+		info.app.description=Account Service Version 1
+		info.app.version=1.0.0 (get from pom)
+		management.info.env.enabled=true
+	> Display service instance:
+	http://localhost:9001/eureka/apps
+	> Each service send hartbeat to eureka every 30s
+	
+> Week_13: Feign Client
+	> Set up:
+	    1. Add dependencies
+	    2. Add @EnableFeignClients
+	    3. Create:
+			@FeignClient(name = "loan")
+			public interface LoanService {
+				@GetMapping(value = "/api/loans/{customerId}")
+				List<LoanDTO> getLoanInfoByCustomerId(Integer customerId);
+			}
+		4. Use cmd: mvn clean package and mvn spring-boot:run
+		
+		
+	> Shut down service by actuator:
+	  1. management.endpoint.shutdown.enabled=true
+	  2. [POST] http://localhost:8080/actuator/shutdown
+	     it will remove instance from eureka also
+		 
+> Week_14: 
+    > Feign Client can't connect to other service via service name
+		1. Include url 
+		@FeignClient(name = "loan", url = "localhost:8090")
+	> Client side loan balance:
+	  1. account service call to eureka server to get loan_service
+	  2. account serice cache(Feign Client) IP information of each service for call to other service directly
+	  3. periodly, account service will call to eureka server to update cache
+
+	> Eureka Self-Preservation: to avoid traps in network
+      - Self-Preservation mode is mode represent service instance is under or equal Threshold.
+	  - Threshold is minimun of instance in eureka server
+	  
+	> Noted:
+	  - Normally, when each service didn't send hartbeat to eureka server, eureka will 
+	  remove it's instance but self-preservation mode is not remove when it meet the limit(threshold)
+	
+
+> Week_15: deploy Mongo DB
+    > Set Up Mongo DB
+	  1. Add dependencies
+		<dependency>
+			<groupId>io.github.resilience4j</groupId>
+			<artifactId>resilience4j-circuitbreaker</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.github.resilience4j</groupId>
+			<artifactId>resilience4j-timelimiter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.github.resilience4j</groupId>
+			<artifactId>resilience4j-spring-boot2</artifactId>
+		</dependency>
+		
+	  2. add config properties two ways: 
+		 I. - create cluster in mongodb website.
+		    - add config:
+				spring.data.mongodb.uri=mongodb+srv://kimhak123:XxE9n3tliYbJMWoq@cluster0.vpa07.mongodb.net/
+				spring.data.mongodb.database         = account
+		 II. add config local db:
+			spring.data.mongodb.database          = account
+			spring.data.mongodb.port              = 27017
+			spring.data.mongodb.host              = ${MONGODB_HOST_NAME:localhost}
+		
+	  4. Add Anotation and Use MongoRepository instead of JPA Repository
+	  
+	> Noted: if use mongo db, we don't need other db and JPA 
+
+> Week_16_17: Challenge 5 : Resilency
+    > How to avoid cascading failure?
+	  - Use Resilence4j and it have 4 patterns:
+	    + Circuit Breaker: use to stop making request when service invoke is falling.
+		  - CLOSED: work normal
+		  - OPEN: Stop service
+		  - HALF_OPEN: if under threshold, it will OPEN, otherwise CLOSED
+		+ Fallback: alternative path to falling request( Give default value)
+		+ Retry: retry when failure
+		+ Rate Limit: limit the number of calls to a service on any period
+		+ Bulkhead: limit the number outgoing concurrent requests to a service to avoid overloading
+	
+	> How to handle failure gracfully fallback ?
+	
+	> How to make all service have self-healing capable?
+	
+	> Circuit Breaker set up:
+	  1. add dependencies
+	  2. add config on application.properties
+		 resilience4j.circuitbreaker.configs.default.registerHealthIndicator= true
+		 resilience4j.circuitbreaker.instances.customerDetailSupport.minimumNumberOfCalls= 5
+		 resilience4j.circuitbreaker.instances.customerDetailSupport.failureRateThreshold= 50
+		 resilience4j.circuitbreaker.instances.customerDetailSupport.waitDurationInOpenState= 30000
+		 resilience4j.circuitbreaker.instances.customerDetailSupport.permittedNumberOfCallsInHalfOpenState=2
+	  3. add anotation @CircuitBreaker
+	  4. update name of CircuitBreaker the same on application.properties
+	 
+	> Fallback set up:
+	  1. add @CircuitBreaker(name = "CustomerDetailSupport", fallbackMethod = "getCustomerDetailDefault")
+	  2. create method with name getCustomerDetailDefault and add param Throwable
+
+	> Retry set up:
+	  1. add config on application.properties
+	     resilience4j.retry.configs.default.registerHealthIndicator= true
+		 resilience4j.retry.instances.retryCustomerDetail.maxRetryAttempts= 3
+		 resilience4j.retry.instances.retryCustomerDetail.waitDuration= 2000
+	  2. add anotation @Retry(name = "retryGetCustomerDetail")
+	  
+	> Rate Limiter set up:
+	  1. add config on application.properties 
+			resilience4j.ratelimiter.configs.default.registerHealthIndicator= true
+			resilience4j.ratelimiter.instances.greetingRateLimit.timeoutDuration=10000 # Maximum time to wait for a permission
+			resilience4j.ratelimiter.instances.greetingRateLimit.limitRefreshPeriod=10000  # Time period in which permissions are refreshed
+			resilience4j.ratelimiter.instances.greetingRateLimit.limitForPeriod=1 # Number of calls allowed in each time period
+	  2. add anotation @RateLimiter
+	    @RateLimiter(name = "greetingRateLimit", fallbackMethod = "sayHi")
+ 
+ 
+> Week_18: Pratice
+    > Mount disk
+	  1. add volumn to Mongo DB:
+	     volumns:
+		    - './data:/data/db'
+	    
+> Week_19:
+    > Challenge_6: Rounting, Cross Cutting Concern
+	
+    > Cross Cutting Concern ( not bussiness logic ): like logging, auditing, tracing and security across multiple microservices
+	
+	> Why API Gateway / Edge Server: 
+	  1. Maintain single entrypoint:
+	  2. Cross Cutting Concern: 
+	  3. Route Base on Customer requirement:
+    > API Gateway set up: use Spring Clude Gateway
+		I. Add dependencies:
+		    1. Gateway
+		    2. Eureka Client
+		    3. Actuator
+		    4. Devtool
+		    5. Config Client
+		II. Add config properties:
+	        1. Gateway
+			  # This enables the Gateway Actuator Endpoint
+		      management.endpoint.gateway.enabled=true
+			  # Enables Discovery Locator for the Spring Cloud Gateway
+			  spring.cloud.gateway.discovery.locator.enabled=true
+			  # Converts the Service ID from the discovery server to lowercase when creating routes.
+			  spring.cloud.gateway.discovery.locator.lowerCaseServiceId=true
+			  
+	        2. Add configserver
+		    3. Add Eurekaserver
+		III.Processing:
+		    1. Check on Eureka server
+		    2. Check service: http://localhost:8072/actuator/gateway/routes
+		    3. http://localhost:8072/ACCOUNT/api/customers/detail/1
+	  
+	> Pre-Filter(Request): validation, include, exclude, authentication, Authorization, Rate Limit, Convert Protocol, etc.
+ 
+	> Post-Filter(Response): validation, include, exclude,logging, cache, etc.
+> Week_20_Custom_Gateway: 
+    > Custom URL:
+		1. create new bean: 
+		@Bean
+		public RouteLocator routes( RouteLocatorBuilder builder) {
+			return builder.routes()
+					      .route( p -> p.path("/learn/**")
+							            .filters(f -> f.rewritePath("/account/(?<segment>/?.*)", "/${segment}")
+									    .addResponseHeader("X-RESPONSE-TIME", "")
+						  )
+						  .uri("lb://ACCOUNT")
+					).build();
+		}
+	
+	> Custom Pre and Post Filter:
+	  1. create class or bean implement GlobalFilter and add uuid to pre-filter
+	    @Bean
+		public GlobalFilter postFilter(){
+			return ( exchange, chain) -> chain.filter(exchange).then(
+					Mono.fromRunnable(()->{
+						String connectorId = gatewayUtility.getConnectorId(exchange);
+						exchange.getRequest().mutate().header(gatewayUtility.CONNECTOR_ID, connectorId);
+					})
+			);
+		}
+	  - NOTED: .then(...) method allows you to define post-processing logic that should run after the current operation in the reactive chain finishe
+
+> Week_21_Implement_Config_server: 54
+	> call one config, other config refresh auto(Manually):
+		1. set up rabbitMQ docker:
+		  docker run -it --rm --name rabbitmq -p 5672:5672 -p 1572:1572 rabbitmq:3.12-management
+		  
+		1. add dependency to service (account, loan):
+		   - rabbit MQ
+		    <dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-starter-bus-amqp</artifactId>
+			</dependency>
+		   
+		2. Add config properties:
+		   spring.rabbitmq.host=localhost
+		   spring.rabbitmq.port=5672
+		   spring.rabbitmq.username=guest
+		   spring.rabbitmq.password=guest
+		   
+		3. process:
+		   - http://localhost:8080/actuator/busrefresh
+	
+	> auto refresh config: by webhook
+		1. add dependency:
+		   - actuator
+		   - rabbit MQ
+		   - config monitor
+		   
+		2. Add config properties:
+		   spring.rabbitmq.host=localhost
+		   spring.rabbitmq.port=5672
+		   spring.rabbitmq.username=guest
+		   spring.rabbitmq.password=guest
+		   
+		3. Add webhook:
+		   - set up hookdeck with cmd
+		   - login website hookdeck: update endpoint and get source url
+		   - add url: hookdeck's source url
+           - register hookdeck: https://console.hookdeck.com/
+	
+	
+	> Set Up Hookdeck:
+	  + cmd setup scoop:
+		Set-ExecutionPolicy RemoteSigned -scope CurrentUser
+		iwr -useb get.scoop.sh | iex
+	  + setup hookdeck:
+		scoop bucket add hookdeck https://github.com/hookdeck/scoop-hookdeck-cli.git
+		scoop install hookdeck
+	  + get url:
+	    hookdeck listen 8071 Source
+		
+	  + login:
+        hookdeck listen 8071
+	  + logout:
+	    hookdeck logout
+		
+		 
+	> Process hookdeck: Webhook → Hookdeck Server → Hookdeck Local → Local Server
+	  1. when have something change github webhook will send the event to
+	    2. hookdeck: then hookdeck will forward it to local hookdeck after that it forward to
+		   3. config server
+		   
+> Week_22_Docker_&_Health_Check: 
+    > Set up health check:
+	    management.endpoints.web.exposure.include = *
+	    management.info.env.enabled               = true
+	    management.endpoint.shutdown.enabled      = true
+
+		management.health.livenessstate.enabled   = true
+		management.health.readinessstate.enabled  = true
+		management.endpoint.health.probes.enabled = true
+	
+	> Auto build docker image without docker file:
+		1. Add pugin:
+			<plugin>
+				<groupId>com.google.cloud.tools</groupId>
+				<artifactId>jib-maven-plugin</artifactId>
+				<version>3.3.2</version>
+				<configuration>
+					<to>
+						<image>pisethbank/${project.artifactId}:v2</image>
+					</to>
+				</configuration>
+			</plugin>
+		2. run cmd:
+			mvn compile jib:dockerBuild
+			
+	> Run Docker Compose:
+		
+	> RabbitMQ UI:
+		- download image and run:
+		docker run -d --hostname rmq --name rabbit-server -p 15672:15672 -p 5672:5672 rabbitmq:3-management
+		- access: 
+		  http://localhost:15672/
+		  
+    > Fix rabbitmq monitor
+
+> Week_25_Observability_&_Monitor:
+    > Observability: is the ability ot understand the internal state of a system by observing its outputs.
+		- There are three pillars of observability are:
+			+ Metric: track CPU, RAM, reponse time...
+			+ Logs: track error, exception and other exception events ...
+			+ Traces: track the area, path, bottlenecks
+	
+	> Monitoring: is mocroservice involves checking the telemetry data availability for the appliation and defining alerts for known failure states.
+		- Use for:
+			+ Identify and troubleshoot problems
+			+ Track the thealth og your microservices
+			+ Optimize your microservice
+		- There are three pillars as observability( observability check more deep problem)
+	
+	> Monitory is racting to problem while observability is fixing them in real time.
+	
+	
+	> Grafana Loki & Promtail:
+		- Grafana Loki: is a horizontally scablable highly available, cost-effective log aggregation system.
+		- Promtail: is a lightweight log agent that ships logs from your containers to Loki.
+		
+		- Set Up:
+			+ install docker file via powershell:
+				wget https://raw.githubusercontent.com/grafana/loki/main/examples/getting-started/loki-config.yaml -O loki-config.yaml
+				wget https://raw.githubusercontent.com/grafana/loki/main/examples/getting-started/alloy-local-config.yaml -O alloy-local-config.yaml
+				wget https://raw.githubusercontent.com/grafana/loki/main/examples/getting-started/docker-compose.yaml -O docker-compose.yaml
+		
+			+ merge docker-compose's grafana with main docker-compose:
+				- add all service each file
+				- update service base on network
+	
+	> Micrometer, Prometheus & Grafana:
+		- Micrometer automatically expose(Convert Data) /actuator/metrics data into something your monitoring sytem can unsertand.
+		
+	> Prometheus: the most common format for exporting metrics is the one used by Prometheus, which is "an open-source systems monitoring and alerting tollkit".
+	
+	> Grafana: is a visualization tool that can be used to create dashboards amd charts fro Prometheuse data.
+	
+	> Set Up Prometheus & Metric:
+		- Add dependencies:
+			<dependency>
+				<groupId>io.micrometer</groupId>
+				<artifactId>micrometer-registry-prometheus</artifactId>
+			</dependency>
+			
+		- Add Config Properties:
+			management.metrics.tags.application: ${spring.application.name}
+	
+	> Process Prometheus:
+		- Individual:
+			http://localhost:8080/actuator/prometheus
+		- prometheus doamin:
+			http://localhost:9090/targets
+	  
+	> Connect Prometheus with Grafana:
+		- http://localhost:3000/connections/datasources
+		- and new data scource:  http://prometheus:9090/
+		
+    > Alert:
+		- Set Rule
+		- set Pulicy
+	    
+		
+> WeeK_28_Summary:
+    > Managing logs:
+		- Microservices(Fetches logs)
+		- Promtail(Agent): collects logs from containers process & forward them to Loki
+	    - Loki: log aggregation system and indexing(esay to search)
+		- Grafana: UI
+	> Metrics:
+		- Microservices
+		- Micrometer: collect information about service
+		- Prometheus: format data and Aggregate, Indexing log
+		- Grafana: UI
+	> Tacing:
+		- OpenTelemetry: Collect log
+		- Tempo: Aggregate, Indexing log
+		- Grafana: UI
+			
+		
+	> Tracing three primary concept:
+		- Tage: 
+		- Trace:
+		- Span: 
+			*spnand ID is generate for each service
+	
+	
+	> Tacing 
+	
+	
+> Week_27_Alert_Notification:
+
+	> Custom UI Granfana: 
+	
+	> Send Alert Message: 
+	
+> Week_29_Tracing_Tempo: 
+	> Set up service:
+	  - add dependency:
+		<otelVersion>1.27.0</otelVersion>
+		
+		<dependency>
+			<groupId>io.opentelemetry.javaagent</groupId>
+			<artifactId>opentelemetry-javaagent</artifactId>
+			<version>${otelVersion}</version>
+			<scope>runtime</scope>
+		</dependency>
+		
+	  - Add config properties:
+		logging.level.com.piseth.bank.configserver=DEBUG
+		logging.pattern.level= "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
+		
+
+	> Set up docker:
+		- new files:
+			+ datasource.yml
+			+ tempo.yml
+		- 
+		- set up all docker service:
+			JAVA_TOOL_OPTIONS: "-javaagent:/app/libs/opentelemetry-javaagent-1.27.0.jar"
+			OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4317
+			OTEL_METRICS_EXPORTER: none
+			
+
+
+		- Add volumn to grafana:
+			volumes:
+				- ../../Observability/Grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+
+
+
+	> Config Tempo with Spring boot 3.3.4:
+		- add dependencies: 
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-actuator</artifactId>
+			</dependency>
+			<dependency>
+				<groupId>io.micrometer</groupId>
+				<artifactId>micrometer-tracing-bridge-brave</artifactId>
+				<version>1.3.4</version>
+			</dependency>
+		
+		- config properties:
+			management.otlp.metrics.export.url=http://localhost:9090/api/v1/otlp/v1/metrics
+			management.otlp.metrics.export.step=2s
+			management.tracing.sampling.probability=1.0
+			management.zipkin.tracing.endpoint=http://localhost:4318/v1/traces
+			management.zipkin.tracing.encoding=PROTO3
+			management.metrics.distribution.percentiles-histogram.http.server.requests=true
+		
+> Week_29_Security: Centralized Identity and Access Management ( IAM )
+		> Using Oauth2/OpenID connect Keycloak (IAM), Spring Security we 
+			can secure the microservice and handle the above challengs.
+			
+		> Client Credentials Grant Type Flow in Oauth2:
+			1. CLIENT(External Backend) to AUTH SERVER(Keycloak):
+			   - send: Client credentials
+			   - get: Access Token
+			   
+			2. CLIENT to RESOURCE SERVER(Gatewayserver):
+			   - send: Access Token
+			   - get: resource
+		
+	    > Authorization Code Grant Type Flow:
+			1. USER call to AUTH SERVER:
+    			- send: Crdential
+				
+			2. AUTH SERVER to CLIENT:
+			    - give: AUTHORIZATION CODE
+				
+			3. CLIENT CALL to AUTH SERVER:
+			    - send: client credentail
+                - send: AUTHORIZATION CODE
+				- get: token
+				
+			4. CLIENT to RESOURCE SERVER:
+			    - send: token
+				- get: resource
+				
+		> Set up keycloak:
+			- keycloak image:
+			  docker run -p 8080:8080 -e KC_BOOTSTRAP_ADMIN_USERNAME=admin -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:26.1.0 start-dev
+		
+		
+		> Set Client Credentials Grant Type(gatewayserver):
+			1. Add dependencies:
+				<dependency>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-security</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>org.springframework.security</groupId>
+					<artifactId>spring-security-oauth2-resource-server</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>org.springframework.security</groupId>
+					<artifactId>spring-security-oauth2-jose</artifactId>
+				</dependency>
+				
+			2. New class:
+				@Configuration
+				@EnableWebFluxSecurity
+				public class SecurityConfig {
+
+					@Bean
+					public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity serverHttpSecurity) {
+						serverHttpSecurity.authorizeExchange(exchanges -> exchanges.pathMatchers(HttpMethod.GET).permitAll()
+										.pathMatchers("/account/**").authenticated()
+										.pathMatchers("/card/**").authenticated()
+										.pathMatchers("/loan/**").authenticated())
+								.oauth2ResourceServer(oAuth2ResourceServerSpec -> oAuth2ResourceServerSpec
+										.jwt(Customizer.withDefaults()));
+						serverHttpSecurity.csrf(csrfSpec -> csrfSpec.disable());
+						return serverHttpSecurity.build();
+					}
+				}
+				
+			3. application.properties
+				spring.security.oauth2.resourceserver.jwt.jwk-set-uri="http://localhost:9080/realms/master/protocol/openid-connect/certs"
+		
+		> Get Access Resource Server:
+			- create Client ID
+			- call api generate token: http://localhost:9080/realms/master/protocol/openid-connect/token
+			- call recourse server wuth oauth2 header
+		
+		> Set up keycloak with docker:
+			1. new service:
+				keycloak:
+					image: quay.io/keycloak/keycloak:23.0.4
+					container_name: keycloak
+					ports:
+					  - "9080:8080"
+					environment:
+					  KEYCLOAK_ADMIN: "admin"
+					  KEYCLOAK_ADMIN_PASSWORD: "admin"
+					command: "start-dev"
+					extends:
+					  file: common.yml
+					  service: ms-deploy-network
+					  start_period: 10s
+					  
+			2. other services(gatewayserver): add env
+				SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI: "http://keycloak:9080/realms/master/protocol/openid-connect/certs"
+				
+	> Week_31_Authorization_Code:
+	    > Set Up Step:
+			- Keycloak:
+				1. create client
+				2. create user
+				3. create role
+			- postman:
+				1. Grant type: Authorization CODE
+				2. Input other Info
+			- auth server( keycloak ):
+				1. input new user
+				
+	> Week_32_Event_Driven_Microservices: 
+		> Event-driven:
+			- Event-driven microservice can build using event-drivent architecture, producing and consuming events using async
+			communication, event broker, spring cloud function, spring cloud stream.
+			- Event-diven Models:
+				1. Publisher/Subscriber(Pub/Sub) Model : New subcriber joining later will don't have ability to access past events.
+				2. Event Streaming Model : New Subscriber have ability get old publisher
+			- AMQP: Advanced Message Queuing Protocol
+			- AMQP have 3 specifiation:
+			  1. Producer: publisher
+			  2. Consumer: subcriber
+			  3. Message Broker: The middleware that reciecves message from producers and directs to appropriate consumers
+			  
+		> Spring cloud function: is a project with the following high-level goals
+			
+	> Week_34_Spring_Cloud_Stream:
+		> Set up:
+			1. add dependencies:
+				<dependency>
+					<groupId>org.springframework.cloud</groupId>
+					<artifactId>spring-cloud-function-context</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>org.springframework.cloud</groupId>
+					<artifactId>spring-cloud-starter-function-web</artifactId>
+				</dependency>
+				
+			2. create @bean function:
+				@Bean
+				public Function<CustomerMessageDto, String> email(){
+					....
+				}
+			
+		> Function composite: combine 2 function
+			spring.cloud.function.definition=email|sms
+			
+		> Spring Could Stream(RabbitMQ, Kafka, ...):
+			I. The core building block of spring could stream are:
+				1. Destination Binders(provider): components responsible to provide integration with the external message system
+				2. Destination Bindings(Bridg): Bridge between the external messaging systems and application code(producer/consumer) ptovided by the end user.
+				3. Message(Data): The canonical data structure used by producer and consumers to communicate with description binders.
+		
+	> Week_35_RabbitMQ:
+	
+	
+	> Week_36_Kafka:
+	    > Kafka is a distributed event streaming flateform.
+		> 
+		
+		
+		
+		
+	> RabbitQR vs Kafka: 
+		1. Design:
+		   Kafka is an open-source distributed event streaming flateform. It can handle large amount data, while rabbitMQ is a message broker. 
+
+	> Week_37_Kafka_Demo:
+	    > Install Kafka:
+		  https://kafka.apache.org/quickstart
+		
+		> Set Up Kafka: 
+			1. Add dependency:
+				<dependency>
+					<groupId>org.springframework.cloud</groupId>
+					<artifactId>spring-cloud-stream</artifactId>
+				</dependency>
+				<dependency>
+					<groupId>org.springframework.cloud</groupId>
+					<artifactId>spring-cloud-stream-binder-kafka</artifactId>
+				</dependency>
+				
+			2. Add Config Properties:
+				spring.cloud.stream.kafka.binder.brokers     = localhost:9092
+		
+		> Create Producer(Account Service):
+			1. Add config properties
+			3. Create function sending topic
+			
+		> Create Consumer(Message Service):
+			1. Add config properties
+			2. Create function consume message
+			
+	> Week_38_Kafa_Docker_Compose:
+	
+	
+	
+	> Week_39_Kubernete_K8s:
+		- Kubernetes is an open-scource system for automating deployment, scaling and manageing containerized applications.
+		- Kubernetes provides you with:
+			+ Service discovery and load balancing
+			+ Container & storage orchestation
+			+ Automated rollout and rollbacks
+			+ Self-healing
+			+ Secret and Configuration management
+		- Kubernetes architectures have main 2 nodes:
+		  I. Control Pananel/ Master Node:
+		    + control manager: managing an entire cluster
+			+ Scheduler      : is responsible for plaing pods onto avalible nodes in the cluster.
+			+ ETCD           : is a distributed key-value store that serves as the cluster's primary data store.
+			+ kubernetes API Service    : is the primary interface for interacting with the kubernetes cluster.
+		  
+		  II. Worker Node: is nothing but a vituatal machine(VM) running in the cloud or on-prem(a physical server running inside your data center)
+		    + Kube-Ploxy: is a network proxy that runs on each node in your cluster, implementing part of the kubernetes service concept. 
+			+ Kubelet: is an agent that runs on each worker node and cummunicates with the control pannel components.
+			+ Container Runtime(Docker): is responsible for running and managing containers on a worker node.
+			+ Pod(Pod1, Pod2, ...): are the smallest unit of deployment in kubernetes just as the consumer is the smallest unit of deployment in docker.
+			
+	> Week_40_ Kubernetes-setup:
+		- create docker compose file:
+			1. create deployment file
+			2. create service file
+		- run kubernetes file:
+			kubectl apply -f configserver.yml
+		
+		- check deployment:
+			kubectl get deployments
+			
+	> WEEK_41_Kubernetes_Mongo:
+	
+	> Week_42_HELM_Introduce_&_Setup:
+	  > Helm is a package manager kubernetes. it arming to enchance the management of kubernetes projects by offering users a more 
+	         efficient approach to handing thee multitude of yml files involved.
+	  > Set Up:
+	    - Install helm:
+			scoop install helm
+		
+		- Initialize a Helm Chart Repository
+			helm repo add bitnami https://charts.bitnami.com/bitnami
+			
+		- Search Bitnami Repo:
+			helm search repo bitnami
+			
+	  > setup wordpress:
+		  helm install new-app bitnami/wordpress
+			
+	  > setup keycloak:
+		  helm install keycloak bitnami/keycloak
+			
+			
+			
+			
+* Noted:
+	> PgAdmin password: 123
+	> .M2: local dependencies that were downloads
+	> Stateful: store in db
+	> stateles: don't store in DB                                                                                                                           
+	> Timeout when register server in PgAdmin:
+	  - Install posgress
+	  - Open C:\Program Files\PostgreSQL\9.1\data\pg_hba.conf
+	  - Update METHOD to trust
+	> Fault-tolerant : is the proprty that enable a system to continue operationing while one or some of it failure of its commponents.
+	> Resilient in nature ភាពធន់ : 
+	> Fail Fast: Fast response when failure
+	> Upstream: main processing
+	> Quota Policies: 
+    > Port:
+	    - Config: 8071
+		- Account: 8080
+		- Card: 8090
+		- Loan: 8095
+		- Eureka: 9000
+		- gateway: 8072
+	> Liveness: up or down
+	> Readiness: service status is ready ability to get request 
+    > App passcode:
+	  Grafana:fdtv ikwf uiut vzrn
+	> Temporal Coupling in microservices refers to a situation where one microservice depends on the timely response or availability of another microservice to complete its own operation. 
+	> canonical data:  a standardized and simplified representation of data entities and their relationships within an organization.
+	  Ex: app1 using format1 and app2 using format2
+	    -> canonical data is middle of them to map each other
+
+	> Change .m2 locate:
+	  - search( if not exist create new ):
+	    <localRepository>/path/to/custom/repository</localRepository>
+	> Affinity :
+	> Unti-affinity :
+	> Kubernetes manifest file:
+	> Kafka high-throughput: have ability handle high amount data and realtime process
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

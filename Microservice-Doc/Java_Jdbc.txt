@@ -1,0 +1,53 @@
+2. Generate a new Kafka API Key
+- Key: AD36BTWO7FD2UN5I
+- Secret: 7tU8aNsDOFjjv357imD52iuuxAwXuDhiUhyFFvlJbwEECoO4hIL5zsHxkhySZpix
+
+3. Generate a new Schema Registry API Key
+- Key: G3XORIBNQJ3COLWW
+- Secret: rddGsWJJdBgYUNVPInLCTO2u7BSGol/2IC6xC+k7p9987gyyVX4wpQo+5XQVm3cH
+
+4. Create my-connect-standalone.properties in the config directory, whose contents look like the following:
+
+	bootstrap.servers=pkc-619z3.us-east1.gcp.confluent.cloud:9092
+	key.converter=org.apache.kafka.connect.storage.StringConverter
+	value.converter=io.confluent.connect.avro.AvroConverter
+
+	ssl.endpoint.identification.algorithm=https
+	security.protocol=SASL_SSL
+	sasl.mechanism=PLAIN
+	sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="AD36BTWO7FD2UN5I" password="7tU8aNsDOFjjv357imD52iuuxAwXuDhiUhyFFvlJbwEECoO4hIL5zsHxkhySZpix";
+	request.timeout.ms=20000
+	retry.backoff.ms=500
+
+	producer.bootstrap.servers=pkc-619z3.us-east1.gcp.confluent.cloud:9092
+	producer.ssl.endpoint.identification.algorithm=https
+	producer.security.protocol=SASL_SSL
+	producer.sasl.mechanism=PLAIN
+	producer.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="AD36BTWO7FD2UN5I" password="7tU8aNsDOFjjv357imD52iuuxAwXuDhiUhyFFvlJbwEECoO4hIL5zsHxkhySZpix";
+	producer.request.timeout.ms=20000
+	producer.retry.backoff.ms=500
+
+	consumer.bootstrap.servers=pkc-619z3.us-east1.gcp.confluent.cloud:9092
+	consumer.ssl.endpoint.identification.algorithm=https
+	consumer.security.protocol=SASL_SSL
+	consumer.sasl.mechanism=PLAIN
+	consumer.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="AD36BTWO7FD2UN5I" password="7tU8aNsDOFjjv357imD52iuuxAwXuDhiUhyFFvlJbwEECoO4hIL5zsHxkhySZpix";
+	consumer.request.timeout.ms=20000
+	consumer.retry.backoff.ms=500
+
+	offset.flush.interval.ms=10000
+	offset.storage.file.filename=/tmp/connect.offsets
+
+	# Required connection configs for Confluent Cloud Schema Registry
+	value.converter.basic.auth.credentials.source=USER_INFO
+	value.converter.schema.registry.basic.auth.user.info=G3XORIBNQJ3COLWW:rddGsWJJdBgYUNVPInLCTO2u7BSGol/2IC6xC+k7p9987gyyVX4wpQo+5XQVm3cH
+	value.converter.schema.registry.url=https://psrc-6v15j.us-central1.gcp.confluent.cloud
+	database.history.kafka.bootstrap.servers=pkc-619z3.us-east1.gcp.confluent.cloud:9092
+	database.history.consumer.security.protocol=SASL_SSL
+	database.history.consumer.ssl.endpoint.identification.algorithm=https
+	database.history.consumer.sasl.mechanism=PLAIN
+	database.history.consumer.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="AD36BTWO7FD2UN5I" password="7tU8aNsDOFjjv357imD52iuuxAwXuDhiUhyFFvlJbwEECoO4hIL5zsHxkhySZpix";
+	database.history.producer.security.protocol=SASL_SSL
+	database.history.producer.ssl.endpoint.identification.algorithm=https
+	database.history.producer.sasl.mechanism=PLAIN
+	database.history.producer.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="AD36BTWO7FD2UN5I" password="7tU8aNsDOFjjv357imD52iuuxAwXuDhiUhyFFvlJbwEECoO4hIL5zsHxkhySZpix";

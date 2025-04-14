@@ -1,0 +1,151 @@
+Reactive Programing:
+
+> CallBack Function is a function that is passed into another function as an argument
+                    and is expected to execute after some kind of event. 
+> The purpose of the callback function is to inform a class Sync/Async if some work in another class is done.
+
+> Synchronous Callback(Single thread): Any process having multiple tasks where the tasks must be executed in sequence and doesn’t occupy much time should use synchronous Callbacks
+
+> Asynchronous Callback(Multi tread) : When the tasks are not dependent on each other and may take some time for execution we should use Asynchronous callbacks.
+
+
+> Config timeout steam: .timeout(Duration.ofSecends(2))
+                        .onErrorReturn(Collection.emptyList())
+						
+> Pulisher: 
+Ex: Cancel YOUTUB that publisher
+
+> Subscriber:
+Ex: Subscriber like YOUTUB
+
+> Subscription:
+
+> Method:
+	- subscribe(
+	  + onNext(): Do loop items
+	  + onError(): Error occure
+	  + onComplete(): The last process
+	)
+
+> Publisher type:
+	- Mono: 0->1 item
+    - Flux: 0->N items
+
+* Publisher is lazy processing
+
+* Just Method: We use it when we ready have data
+
+* fromSuplier(): is Lazy method
+
+> Pipeline: typically refers to the concept of using a sequence of operations or stages to process data.
+  + how pipelines work with Java Streams:
+    - Source: A stream begins with a source, such as a collection or an array.
+    - Intermediate Operations: These are operations that transform or filter the data in the stream. Examples include map(), filter(), sorted(), etc. Intermediate operations are often chained together to form a pipeline.
+    - Terminal Operation: This is the final operation in the pipeline that produces a result. Examples include collect(), forEach(), reduce(), etc. Once a terminal operation is invoked, the stream is consumed, and the result is generated.
+
+> Parallel excution: excecute multi task at the same time 
+
+> .subscribeOn(Schedulers.boundedElastic()): excute parallel
+
+* If CPU sopport hyper threading so a core have 2 thread.
+
+> Flux.just: Create objecct with initial data list
+
+> Flux.filter(Predicate): filter items
+
+> Flux.fromIterable(Iteratable): Create object flux by Iteratable[List, ArrayList, HasMap,...]
+
+> Steam execute only one time if call over one time it will retrun Error
+  because after done first execute, it will closed
+
+> Flux.rang(Start, cardinal): (5, 5)-> 5, 6, 7, 8, 9
+  end = cardinal + start -1
+
+  it can use to loop do something:
+  Flux.rang(1, 10)
+       .subscribe( z->System.out.println("Print :"+x);
+
+> flux.log(): use to log it processing
+
+
+> Flux.range() vs loop:
+  Loop: Select all item then relase
+  Flux.range: Relase one by one item
+
+> Flux.interval(Duration.ofSecends(2))
+      . subscribe(x->x);
+   : it work every 2 minut
+
+> Flux.next(): Convert Flux to MONO by get the first digit
+
+> Implicit:
+
+> Explicit: 
+
+
+#Week 6
+==> Cold & Hot publisher
+> Cold pulicher: 
+  - need subcriber 
+  - Separate Streaming data(YOUTUB)
+  
+> Hot publisher: 
+  - subcriber is optional
+  - Don't separate Streaming data(TV)
+  - use method share()
+  
+> Define limit of subcriber to start process:
+  .publish()
+  .refCount(num);
+  //num is number of subcriber
+  
+> Auto process don't need subcriber to process it:
+  .publish()
+  .autoConnect();// Like TV
+  
+> Cache(n): cache emit item of previouse subcriber to next subcriber.
+  n is number item. 2 so cache only last 2 items.
+  
+> Scheduler:
+  - boundedElastic: Network/Time-consuming call ( Switch thread)
+  - Parallel: CPU intensive task
+  - Single: Single deadlicated thread for one-off tasks
+  - immediate: Current thread
+ 
+> Operator for Scheduling:
+  - subcribeOn: for upstream
+  - publishOn: for downstream
+  
+Syntax: .subcribeOn(Schedulers.boundedElastic())
+  
+* For default it is on current thread, when we use subcribOn => it switch to schedule thread
+* doFirst: do from under to upper
+  
+  
+  
+#Week9
+------------------Batch-------------------
+- Buffer: collect item util buffer size(list)
+- Window: Collect as Flux
+- Group: Group by property
+
+- Retry: work when have error
+- Repeat: 
+
+  
+
+
+
+
+
+	
+	
+
+
+
+
+
+
+
+
+

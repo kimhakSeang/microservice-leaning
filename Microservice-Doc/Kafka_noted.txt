@@ -1,0 +1,6 @@
+> Kafaka is distrbuted streaming platform that is capable of ahdnling trillions of events a day.
+> Kafak's Core Components include:
+  - Producer: sends records to kafka topics
+  - Consumer: Reads records frim kafka topices.
+  - Broker: Manages the kafka cluster and stores messages.
+  - Zookeeper: coordinates and manage kafka brokers
