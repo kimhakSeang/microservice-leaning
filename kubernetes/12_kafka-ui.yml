@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-ui
+  namespace: kafka # Make sure this matches your Kafka namespace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-ui
+  template:
+    metadata:
+      labels:
+        app: kafka-ui
+    spec:
+      containers:
+        - name: kafka-ui
+          image: provectuslabs/kafka-ui:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: KAFKA_CLUSTERS_0_NAME
+              value: "kafka" # Replace with a name for your cluster
+            - name: KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS
+              value: "kafka.kafka:9092" # Replace with your Kafka broker service address(es)
+            # You can configure more clusters by incrementing the index (e.g., KAFKA_CLUSTERS_1_NAME, KAFKA_CLUSTERS_1_BOOTSTRAPSERVERS)
+            # Optional: Authentication (if your Kafka cluster requires it)
+            # - name: KAFKA_CLUSTERS_0_AUTH_TYPE
+            #   value: "PLAIN"
+            # - name: KAFKA_CLUSTERS_0_AUTH_USERNAME
+            #   value: "your-username"
+            # - name: KAFKA_CLUSTERS_0_AUTH_PASSWORD
+            #   value: "your-password"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-ui
+  namespace: kafka # Make sure this matches your Kafka namespace
+spec:
+  selector:
+    app: kafka-ui
+  ports:
+    - protocol: TCP
+      port: 9091
+      targetPort: 8080
+  type: LoadBalancer # Use ClusterIP for internal access or NodePort/LoadBalancer for external access
