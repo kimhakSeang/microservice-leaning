@@ -1,0 +1,21 @@
+deploymentName: loan-deployment
+serviceName: loan
+appLabel: loan
+appName: loan
+replicaCount: 1
+image:
+  repository: kimhakseang/loan
+  tag: v3
+containerPort: 8095
+service:
+  type: ClusterIP
+  port: 8095
+  targetPort: 8095
+appname_enabled: true
+profile_enabled: true
+config_enabled: true
+eureka_enabled: true
+resouceserver_enabled: false
+otel_enabled: true
+kafka_enabled: true
+datasource_enabled: true

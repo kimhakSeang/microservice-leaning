@@ -846,7 +846,19 @@ Week_12: Erekaserver
 	  > setup keycloak:
 		  helm install keycloak bitnami/keycloak
 			
-			
+	> WEEK_44_Create_Own_Helm_Chart:
+	  - create folder chart:
+	    helm create chart-name
+		
+	> Week_45_46_Deploy_All_Service:
+	  - Install Kafka:
+	    1. clone bitnami helm chart kafka.
+		2. change value: username, password and policy to PLAINTEXT
+	  - Install Mongodb, Postgresql:
+	    1. clone bitnami helm chart
+		2. change username and password
+		
+		
 			
 			
 * Noted:
@@ -894,6 +906,20 @@ Week_12: Erekaserver
 
 
 
+> Kafka:
+kafka.default.svc.cluster.local:9092
+
+> MongoDB:
+spring.data.mongodb.database          = account
+spring.data.mongodb.host              = ${MONGODB_HOST_NAME:localhost}
+spring.data.mongodb.port              = ${MONGODB_PORT:27018}
+spring.data.mongodb.username          = ${MONGODB_USER:user}
+spring.data.mongodb.password          = ${MONGODB_PASSWORD:password}
+
+> Kadeck:
+docker run -d -e xeotek_kadeck_free="<your_email_address>" -e xeotek_kadeck_port=8080 -e xeotek_kadeck_secret="" -e xeotek_kadeck_teamid="" -p 3500:8080 --name kadeck -v kadeck_data:/root/.kadeck/ xeotek/kadeck:6.0.5
+
+kafka-controller-0.kafka-controller-headless.default.svc.cluster.local:9092,kafka-controller-1.kafka-controller-headless.default.svc.cluster.local:9092,kafka-controller-2.kafka-controller-headless.default.svc.cluster.local:9092
 
 
 
@@ -901,12 +927,4 @@ Week_12: Erekaserver
 
 
 
-
-
-
-
-
-
-
-
-
+ kubectl port-forward --namespace default svc/postgresql 5435:5435 & PGPASSWORD="$POSTGRES_PASSWORD" psql --host 127.0.0.1 -U user loan -p 5435

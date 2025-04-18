@@ -1,0 +1,21 @@
+deploymentName: eurekaserver-deployment
+serviceName: eurekaserver
+appLabel: eurekaserver
+appName: eurekaserver
+replicaCount: 1
+image:
+  repository: kimhakseang/eurekaserver
+  tag: v3
+containerPort: 9001
+service:
+  type: LoadBalancer
+  port: 9001
+  targetPort: 9001
+appname_enabled: true
+profile_enabled: true
+config_enabled: true
+eureka_enabled: false
+resouceserver_enabled: false
+otel_enabled: false
+kafka_enabled: false
+datasource_enabled: false

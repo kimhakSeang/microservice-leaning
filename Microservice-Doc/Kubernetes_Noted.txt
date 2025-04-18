@@ -48,13 +48,22 @@ kubectl logs [pod_name] -t
 > Check pod event description
 kubectl describe pod postgres-585f86f88c-8dlxr -n postgres
 
+#>>> Controller
+> Delete deployment or stateful
+kubectl delete [statefulset/deployment] [name]
+kubectl delete statefulset.app keycloak-postgresql
 
-#>>> ALL 
+#>>> ALL
 > Deploy All
 kubectl apply -f .
 
+> Check All Pods
+kubectl get all
+
 > Delete All Deployments and Services
 kubectl delete deployments --all
+
+
 
 
 Noted:
@@ -86,16 +95,6 @@ kubectl delete -f 7_gatewayserver.yml
 kubectl delete -f 8_account.yml
 kubectl delete -f 9_loan.yml
 kubectl delete -f 10_message.yml
-
-
-
-
-
-
-
-
-
-
 
 
 

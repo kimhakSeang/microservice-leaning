@@ -1,0 +1,21 @@
+deploymentName: configserver-deployment
+serviceName: configserver
+appLabel: configserver
+appName: configserver
+replicaCount: 1
+image:
+  repository: kimhakseang/configserver
+  tag: v3
+containerPort: 8070
+service:
+  type: ClusterIP
+  port: 8070
+  targetPort: 8070
+appname_enabled: true
+profile_enabled: true
+config_enabled: true
+eureka_enabled: false
+resouceserver_enabled: true
+otel_enabled: false
+kafka_enabled: false
+datasource_enabled: false
