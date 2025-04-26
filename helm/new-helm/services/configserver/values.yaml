@@ -13,9 +13,10 @@ service:
   targetPort: 8070
 appname_enabled: true
 profile_enabled: true
-config_enabled: true
+config_enabled: false
 eureka_enabled: false
-resouceserver_enabled: true
+resouceserver_enabled: false
 otel_enabled: false
 kafka_enabled: false
-datasource_enabled: false
+postgresql_enabled: false
+mongodb_enabled: false

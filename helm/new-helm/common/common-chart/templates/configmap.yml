@@ -1,31 +1,38 @@
-{{- define "common.configmap" -}}
+{{- define "common.configmap" }}
+
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ .Values.global.configMapName }}
 data:
-  SPRING_PROFILES_ACTIVE: {{ .Values.global.activeProfile }}
+  SPRING_PROFILES_ACTIVE: "{{ .Values.global.activeProfile }}"
 
   # Configserver
-  SPRING_CONFIG_IMPORT: {{ .Values.global.configServerURL }}
+  SPRING_CONFIG_IMPORT: "{{ .Values.global.configServerURL }}"
 
   # Eureka
-  EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: {{ .Values.global.eurekaServerURL }}
+  EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: "{{ .Values.global.eurekaServerURL }}"
 
   # Keycloak
-  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI: {{ .Values.global.keyCloakURL }}
+  SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI: "{{ .Values.global.keyCloakURL }}"
 
   # Tempo
-  JAVA_TOOL_OPTIONS: {{ .Values.global.openTelemetryJavaAgent }}
-  OTEL_EXPORTER_OTLP_ENDPOINT: {{ .Values.global.otelExporterEndPoint }}
-  OTEL_METRICS_EXPORTER: {{ .Values.global.otelMetricsExporter }}
+  JAVA_TOOL_OPTIONS: "{{ .Values.global.openTelemetryJavaAgent }}"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "{{ .Values.global.otelExporterEndPoint }}"
+  OTEL_METRICS_EXPORTER: "{{ .Values.global.otelMetricsExporter }}"
 
-  # KAFKA
-  SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: {{ .Values.global.kafkaBrokerURL }}
+  # Kafka
+  SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: "{{ .Values.global.kafkaBrokerURL }}"
 
-  # DB Connection
-  SPRING_DATASOURCE_URL: {{ .Values.global.datascource }}
-  SPRING_DATASOURCE_USERNAME: {{ .Values.global.user }}
-  SPRING_DATASOURCE_PWD: {{ .Values.global.password }}
+  # Postgres
+  POSTGRES_URL: "{{ .Values.global.postgresHostUrl }}"
+  POSTGRES_USERNAME: "{{ .Values.global.postgresUser }}"
+  POSTGRES_PWD: "{{ .Values.global.postgresPassword }}"
 
-{{- end -}}
+  # Mongo
+  MONGODB_HOST: "{{ .Values.global.mongoHost }}"
+  MONGODB_PORT: "{{ .Values.global.mongoPort }}"
+  MONGODB_USER: "{{ .Values.global.mongoUser }}"
+  MONGODB_PASSWORD: "{{ .Values.global.mongoPassword }}"
+
+{{- end }}

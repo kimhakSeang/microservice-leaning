@@ -857,6 +857,7 @@ Week_12: Erekaserver
 	  - Install Mongodb, Postgresql:
 	    1. clone bitnami helm chart
 		2. change username and password
+	** Fix Mongo and kafka
 		
 		
 			
@@ -916,6 +917,12 @@ spring.data.mongodb.port              = ${MONGODB_PORT:27018}
 spring.data.mongodb.username          = ${MONGODB_USER:user}
 spring.data.mongodb.password          = ${MONGODB_PASSWORD:password}
 
+
+> Postgresql:
+spring.datasource.url                      = ${POSTGRES_URL:jdbc:postgresql://localhost:5435/loan}
+spring.datasource.username                 = ${POSTGRES_USERNAME:user}
+spring.datasource.password                 = ${POSTGRES_PWD:password}
+
 > Kadeck:
 docker run -d -e xeotek_kadeck_free="<your_email_address>" -e xeotek_kadeck_port=8080 -e xeotek_kadeck_secret="" -e xeotek_kadeck_teamid="" -p 3500:8080 --name kadeck -v kadeck_data:/root/.kadeck/ xeotek/kadeck:6.0.5
 
@@ -925,6 +932,19 @@ kafka-controller-0.kafka-controller-headless.default.svc.cluster.local:9092,kafk
 
 
 
+> MongoDB
+kubectl port-forward --namespace default svc/mongodb 27018:27017 &
+> Posgresql
+kubectl port-forward --namespace default svc/postgresql 5435:5435 &
+> Kafka
+kubectl port-forward --namespace default svc/postgresql 9092:9092 &
 
+MONGODB_HOST:mongodb.default.svc.cluster.local
+MONGODB_PORT:27018
+MONGODB_USER:user
+MONGODB_PASSWORD:password
 
- kubectl port-forward --namespace default svc/postgresql 5435:5435 & PGPASSWORD="$POSTGRES_PASSWORD" psql --host 127.0.0.1 -U user loan -p 5435
+mongdbhost: mongodb.default.svc.cluster.local
+mongodbport:27018
+mongouser:user
+mongopassword:password

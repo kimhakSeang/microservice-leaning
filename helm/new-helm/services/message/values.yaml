@@ -18,4 +18,5 @@ eureka_enabled: false
 resouceserver_enabled: false
 otel_enabled: false
 kafka_enabled: true
-datasource_enabled: false
+postgresql_enabled: false
+mongodb_enabled: false

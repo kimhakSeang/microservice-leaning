@@ -763,14 +763,14 @@ service:
   nameOverride: ""
   ## @param service.type Kubernetes Service type (only for standalone architecture)
   ##
-  type: ClusterIP
+  type: LoadBalancer
   ## @param service.portName MongoDB(&reg;) service port name (only for standalone architecture)
   ##
   portName: mongodb
   ## @param service.ports.mongodb MongoDB(&reg;) service port.
   ##
   ports:
-    mongodb: 27017
+    mongodb: 27018
   ## @param service.nodePorts.mongodb Port to bind to for NodePort and LoadBalancer service types (only for standalone architecture)
   ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport
   ##

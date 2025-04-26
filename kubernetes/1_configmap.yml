@@ -38,5 +38,5 @@ data:
   SPRING_DATA_MONGODB_DATABASE: account
 
   # KAFKA
-  SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: "kafka.kafka:9092"
+  SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: "kafka-controller-0.kafka-controller-headless.default.svc.cluster.local:9093"
   # SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: "kafka.kafka.svc.cluster.local:9092"

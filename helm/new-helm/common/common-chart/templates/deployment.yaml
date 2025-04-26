@@ -22,10 +22,13 @@ spec:
         - containerPort: {{ .Values.containerPort }}
           protocol: TCP
         env:
+        #  APP NAME
         {{- if .Values.appname_enabled }}
         - name: SPRING_APPLICATION_NAME
           value: {{ .Values.appName }}
         {{- end }}
+
+        # PROFILE
         {{- if .Values.profile_enabled }}
         - name: SPRING_PROFILES_ACTIVE
           valueFrom: 
@@ -33,6 +36,8 @@ spec:
               name: {{ .Values.global.configMapName }}
               key: SPRING_PROFILES_ACTIVE
         {{- end }}
+
+        # Configserver
         {{- if .Values.config_enabled }}
         - name: SPRING_CONFIG_IMPORT
           valueFrom: 
@@ -40,6 +45,8 @@ spec:
               name: {{ .Values.global.configMapName }}
               key: SPRING_CONFIG_IMPORT
         {{- end }}
+
+        # Eurekaserver
         {{- if .Values.eureka_enabled }}
         - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
           valueFrom: 
@@ -47,6 +54,8 @@ spec:
               name: {{ .Values.global.configMapName }}
               key: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
         {{- end }}
+
+        # Resource Server
         {{- if .Values.resouceserver_enabled }}
         - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI
           valueFrom: 
@@ -54,6 +63,8 @@ spec:
               name: {{ .Values.global.configMapName }}
               key: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI
         {{- end }}
+
+        # Tempo
         {{- if .Values.otel_enabled }}
         - name: JAVA_TOOL_OPTIONS
           valueFrom: 
@@ -73,6 +84,8 @@ spec:
         - name: OTEL_SERVICE_NAME
           value: {{ .Values.appName }}
         {{- end }}
+
+        # Kafka
         {{- if .Values.kafka_enabled }}
         - name: SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS
           valueFrom: 
@@ -81,23 +94,48 @@ spec:
               key: SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS
         {{- end }}
 
-        # Datasource
-        {{- if .Values.datasource_enabled }}
-        - name: SPRING_DATASOURCE_URL
+        # Postgresql
+        {{- if .Values.postgresql_enabled }}
+        - name: POSTGRES_URL
           valueFrom: 
             configMapKeyRef:
               name: {{ .Values.global.configMapName }}
-              key: SPRING_DATASOURCE_URL
-        - name: SPRING_DATASOURCE_USERNAME
+              key: POSTGRES_URL
+        - name: POSTGRES_USERNAME
           valueFrom: 
             configMapKeyRef:
               name: {{ .Values.global.configMapName }}
-              key: SPRING_DATASOURCE_USERNAME
-        - name: SPRING_DATASOURCE_PWD
+              key: POSTGRES_USERNAME
+        - name: POSTGRES_PWD
           valueFrom: 
             configMapKeyRef:
               name: {{ .Values.global.configMapName }}
-              key: SPRING_DATASOURCE_PWD
+              key: POSTGRES_PWD
         {{- end }}
+
+        # Mongodb
+        {{- if .Values.mongodb_enabled }}
+        - name: MONGODB_HOST
+          valueFrom: 
+            configMapKeyRef:
+              name: {{ .Values.global.configMapName }}
+              key: MONGODB_HOST
+        - name: MONGODB_PORT
+          valueFrom: 
+            configMapKeyRef:
+              name: {{ .Values.global.configMapName }}
+              key: MONGODB_PORT
+        - name: MONGODB_USER
+          valueFrom: 
+            configMapKeyRef:
+              name: {{ .Values.global.configMapName }}
+              key: MONGODB_USER
+        - name: MONGODB_PASSWORD
+          valueFrom: 
+            configMapKeyRef:
+              name: {{ .Values.global.configMapName }}
+              key: MONGODB_PASSWORD
+        {{- end }}
+        
         
 {{- end -}}

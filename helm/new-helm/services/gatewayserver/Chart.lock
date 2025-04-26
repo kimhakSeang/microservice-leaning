@@ -1,0 +1,6 @@
+dependencies:
+- name: kimhakseang-common
+  repository: file://../../../common/common-chart
+  version: 0.1.0
+digest: sha256:e4551de61e5d4a5e19c473ff16772db88c11b23122a696b2b48a899f001fd2c3
+generated: "2025-04-24T22:45:12.3632317+07:00"
