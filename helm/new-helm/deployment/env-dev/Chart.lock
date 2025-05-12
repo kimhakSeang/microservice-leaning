@@ -1,0 +1,24 @@
+dependencies:
+- name: helm-common
+  repository: file://../../common/common-chart
+  version: 0.1.0
+- name: configserver
+  repository: file://../../services/configserver
+  version: 0.1.0
+- name: eurekaserver
+  repository: file://../../services/eurekaserver
+  version: 0.1.0
+- name: account
+  repository: file://../../services/account
+  version: 0.1.0
+- name: loan
+  repository: file://../../services/loan
+  version: 0.1.0
+- name: gatewayserver
+  repository: file://../../services/gatewayserver
+  version: 0.1.0
+- name: message
+  repository: file://../../services/message
+  version: 0.1.0
+digest: sha256:68ab6cec25708d88fa5190667fd677d0eede6c3258a0b26342b7362b94cf930c
+generated: "2025-04-27T11:15:11.4849013+07:00"

@@ -6,11 +6,11 @@ replicaCount: 1
 image:
   repository: kimhakseang/eurekaserver
   tag: v3
-containerPort: 9001
+containerPort: 9000
 service:
   type: LoadBalancer
-  port: 9001
-  targetPort: 9001
+  port: 9000
+  targetPort: 9000
 appname_enabled: true
 profile_enabled: true
 config_enabled: true

@@ -857,7 +857,15 @@ Week_12: Erekaserver
 	  - Install Mongodb, Postgresql:
 	    1. clone bitnami helm chart
 		2. change username and password
-	** Fix Mongo and kafka
+		
+	** TODO:
+       - Helm deploy kafka, keycloak
+	   - Set up grafana:
+	     + PROMETHUES: 
+		   - values: add list all services url
+		 + LOKI: don't change
+		 + TEMPO: 
+		   - values: update otlp properties to true
 		
 		
 			
@@ -901,7 +909,7 @@ Week_12: Erekaserver
 	> Kafka high-throughput: have ability handle high amount data and realtime process
 
 
-
+  > 
 
 
 
@@ -938,13 +946,23 @@ kubectl port-forward --namespace default svc/mongodb 27018:27017 &
 kubectl port-forward --namespace default svc/postgresql 5435:5435 &
 > Kafka
 kubectl port-forward --namespace default svc/postgresql 9092:9092 &
+> Promethues
+kubectl port-forward --namespace default svc/prometheus 9093:9093 &
 
 MONGODB_HOST:mongodb.default.svc.cluster.local
 MONGODB_PORT:27018
 MONGODB_USER:user
 MONGODB_PASSWORD:password
 
-mongdbhost: mongodb.default.svc.cluster.local
-mongodbport:27018
-mongouser:user
-mongopassword:password
+mongoHost: mongodb.default.svc.cluster.local
+mongoPort: 27018
+mongoUser: user
+mongoPassword: password
+
+POSTGRES_URL
+POSTGRES_USERNAME
+POSTGRES_PWD
+
+postgresHostUrl: jdbc:postgresql://localhost:5435/loan
+postgresUser: user
+postgresPassword: password

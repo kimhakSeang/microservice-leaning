@@ -26,28 +26,28 @@ appVersion: "1.0.0"
 dependencies:
   - name: helm-common
     version: 0.1.0
-    repository: file://../../../common/common-chart
+    repository: file://../../common/common-chart
 
   - name: configserver
     version: 0.1.0
-    repository: file://../../../services/configserver
+    repository: file://../../services/configserver
 
   - name: eurekaserver
     version: 0.1.0
-    repository: file://../../../services/eurekaserver
+    repository: file://../../services/eurekaserver
 
   - name: account
     version: 0.1.0
-    repository: file://../../../services/account
+    repository: file://../../services/account
 
   - name: loan
     version: 0.1.0
-    repository: file://../../../services/loan
+    repository: file://../../services/loan
 
   - name: gatewayserver
     version: 0.1.0
-    repository: file://../../../services/gatewayserver
+    repository: file://../../services/gatewayserver
 
   - name: message
     version: 0.1.0
-    repository: file://../../../services/message
+    repository: file://../../services/message

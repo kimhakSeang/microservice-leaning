@@ -6,11 +6,11 @@ replicaCount: 1
 image:
   repository: kimhakseang/configserver
   tag: v3
-containerPort: 8070
+containerPort: 8071
 service:
   type: ClusterIP
-  port: 8070
-  targetPort: 8070
+  port: 8071
+  targetPort: 8071
 appname_enabled: true
 profile_enabled: true
 config_enabled: false

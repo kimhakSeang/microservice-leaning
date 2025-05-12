@@ -111,7 +111,7 @@ diagnosticMode:
 image:
   registry: docker.io
   repository: bitnami/keycloak
-  tag: 26.1.5-debian-12-r1
+  tag: 26.2.2-debian-12-r0
   digest: ""
   ## Specify a imagePullPolicy
   ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
@@ -137,7 +137,7 @@ auth:
   adminUser: user
   ## @param auth.adminPassword Keycloak administrator password for the new user
   ##
-  adminPassword: "password"
+  adminPassword: ""
   ## @param auth.existingSecret Existing secret containing Keycloak admin password
   ##
   existingSecret: ""
@@ -546,10 +546,10 @@ sidecars: []
 service:
   ## @param service.type Kubernetes service type
   ##
-  type: ClusterIP
+  type: LoadBalancer
   ## @param service.http.enabled Enable http port on service
   ##
-  http:
+  http: 
     enabled: true
   ## @param service.ports.http Keycloak service HTTP port
   ## @param service.ports.https Keycloak service HTTPS port
@@ -1019,7 +1019,7 @@ metrics:
     ports:
       ## @param metrics.service.ports.http Metrics service HTTP port
       ##
-      http: 8090
+      http: 8080
       ## @param metrics.service.ports.https Metrics service HTTPS port
       ##
       https: 8443
@@ -1135,7 +1135,7 @@ keycloakConfigCli:
   image:
     registry: docker.io
     repository: bitnami/keycloak-config-cli
-    tag: 6.4.0-debian-12-r3
+    tag: 6.4.0-debian-12-r5
     digest: ""
     ## Specify a imagePullPolicy
     ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
@@ -1247,6 +1247,14 @@ keycloakConfigCli:
   ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
   ##
   podTolerations: []
+  ## keycloak-config-cli availability-check configuration
+  ## ref: https://github.com/adorsys/keycloak-config-cli#Configuration
+  ## @param keycloakConfigCli.availabilityCheck.enabled Whether to wait until Keycloak is available
+  ## @param keycloakConfigCli.availabilityCheck.timeout Timeout for the availability check (Default is 120s)
+  ##
+  availabilityCheck:
+    enabled: true
+    timeout: ""
   ## @param keycloakConfigCli.extraEnvVars Additional environment variables to set
   ## Example:
   ## extraEnvVars:
@@ -1330,13 +1338,13 @@ keycloakConfigCli:
 postgresql:
   enabled: true
   auth:
-    postgresPassword: ""
-    username: ""
-    password: ""
+    postgresPassword: "password"
+    username: user
+    password: "password"
     database: bitnami_keycloak
     existingSecret: ""
     secretKeys:
-      userPasswordKey: password
+      userPasswordKey: ""
   architecture: standalone
 ## External PostgreSQL configuration
 ## All of these values are only used when postgresql.enabled is set to false
@@ -1354,11 +1362,11 @@ postgresql:
 ## @param externalDatabase.annotations Additional custom annotations for external database secret object
 ##
 externalDatabase:
-  host: ""
-  port: 5432
-  user: bn_keycloak
+  host: "postgresql-keycloak.default.svc.cluster.local"
+  port: 5437
+  user: user
   database: bitnami_keycloak
-  password: ""
+  password: "password"
   existingSecret: ""
   existingSecretHostKey: ""
   existingSecretPortKey: ""

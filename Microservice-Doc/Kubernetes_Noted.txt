@@ -20,12 +20,16 @@ kubectl get deployments
 > delete deployment & services
 kubectl delete -f [file_name]
 
-#>>> Server
+#>>> Service:
 > Check services
 kubectl get services
 
 > Check replicas:
 kubectl get replicaset
+
+> Delete Service:
+kubectl delete service [service_name]
+
  
 #>>> ConfigMap
 > Check Configmap
