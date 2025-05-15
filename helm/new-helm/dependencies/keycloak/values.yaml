@@ -137,7 +137,7 @@ auth:
   adminUser: user
   ## @param auth.adminPassword Keycloak administrator password for the new user
   ##
-  adminPassword: ""
+  adminPassword: "password"
   ## @param auth.existingSecret Existing secret containing Keycloak admin password
   ##
   existingSecret: ""
@@ -549,13 +549,13 @@ service:
   type: LoadBalancer
   ## @param service.http.enabled Enable http port on service
   ##
-  http: 
+  http:
     enabled: true
   ## @param service.ports.http Keycloak service HTTP port
   ## @param service.ports.https Keycloak service HTTPS port
   ##
   ports:
-    http: 8090
+    http: 80
     https: 443
   ## @param service.nodePorts [object] Specify the nodePort values for the LoadBalancer and NodePort service types.
   ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport
@@ -1338,13 +1338,13 @@ keycloakConfigCli:
 postgresql:
   enabled: true
   auth:
-    postgresPassword: "password"
-    username: user
-    password: "password"
+    postgresPassword: ""
+    username: bn_keycloak
+    password: ""
     database: bitnami_keycloak
     existingSecret: ""
     secretKeys:
-      userPasswordKey: ""
+      userPasswordKey: password
   architecture: standalone
 ## External PostgreSQL configuration
 ## All of these values are only used when postgresql.enabled is set to false
@@ -1362,11 +1362,11 @@ postgresql:
 ## @param externalDatabase.annotations Additional custom annotations for external database secret object
 ##
 externalDatabase:
-  host: "postgresql-keycloak.default.svc.cluster.local"
-  port: 5437
-  user: user
+  host: ""
+  port: 5432
+  user: bn_keycloak
   database: bitnami_keycloak
-  password: "password"
+  password: ""
   existingSecret: ""
   existingSecretHostKey: ""
   existingSecretPortKey: ""

@@ -1,0 +1,35 @@
+Monolithic Archetecture 
+> is Archetecture that have single code base.
+
+Fault tolerance mean System still work while have some parts met the problem.
+
+
+> Advantage of Microservice:
+1. Easy to Develop. Test and Deploy of each module
+2. Practice Agile Methodology
+3. Easy Scale each service
+4. All team can develop the same time
+5. Each Service can use diff technology
+
+Microservice is  method to develop application to small service 
+that can run independence and can communnicate with other service
+in lightweight mechanisms.
+
+"de facto standard" part: it's like the favorite tools everyone uses for these smaller parts.
+It mean the common technology that we used to develop of each part.
+ex: 
+Communication: HTTP, ...
+Deployment: Kubernate, ...
+
+ 
+> DDD: Domain Driven Design
+> DDS: Domain Driven Sizing
+> ESS: Event Stoming Sizing
+  
+____________POST_GET__________________
+1. Payload size and complexity
+   - Larger Payload: url unlimit
+   - Complex Data Structure: allow and Json and Xml or other structured data formats in the request body.
+2. Security
+   - Sensitive Information: data is not exposed in the URL
+   - Authentication Token: securely send authentication tokens and other sensitive information in the request body

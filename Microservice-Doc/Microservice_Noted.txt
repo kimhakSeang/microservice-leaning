@@ -857,15 +857,17 @@ Week_12: Erekaserver
 	  - Install Mongodb, Postgresql:
 	    1. clone bitnami helm chart
 		2. change username and password
-		
-	** TODO:
-       - Helm deploy kafka, keycloak
-	   - Set up grafana:
+	  - Set up grafana:
 	     + PROMETHUES: 
 		   - values: add list all services url
 		 + LOKI: don't change
 		 + TEMPO: 
 		   - values: update otlp properties to true
+		 + GRAFANA: Add datasource values
+		 
+	** TODO:
+       - Fix Postgresql with kafka, keycloak
+	   
 		
 		
 			
