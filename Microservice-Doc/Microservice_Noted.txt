@@ -864,6 +864,8 @@ Week_12: Erekaserver
 		 + TEMPO: 
 		   - values: update otlp properties to true
 		 + GRAFANA: Add datasource values
+	  - Set Up Keycloak:
+	  helm install keycloak bitnami/keycloak -f helm/values.yaml
 		 
 	** TODO:
        - Fix Postgresql with kafka, keycloak
@@ -947,9 +949,11 @@ kubectl port-forward --namespace default svc/mongodb 27018:27017 &
 > Posgresql
 kubectl port-forward --namespace default svc/postgresql 5435:5435 &
 > Kafka
-kubectl port-forward --namespace default svc/postgresql 9092:9092 &
+kubectl port-forward --namespace default svc/kafka 9092:9092 &
 > Promethues
 kubectl port-forward --namespace default svc/prometheus 9093:9093 &
+> Keycloak
+echo Password: $(kubectl get secret --namespace default keycloak -o jsonpath="{.data.admin-password}" | base64 -d)
 
 MONGODB_HOST:mongodb.default.svc.cluster.local
 MONGODB_PORT:27018

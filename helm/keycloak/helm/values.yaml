@@ -1,0 +1,58 @@
+# Global PostgreSQL settings
+global:
+  postgresql:
+    auth:
+      username: user
+      password: password
+      database: bitnami_keycloak
+    service:
+      ports:
+        postgresql: 5432
+
+# Keycloak Admin User Configuration
+auth:
+  adminUser: admin
+  adminPassword: admin
+
+# PostgreSQL Specific Configuration
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: "password"
+    username: user
+    password: password
+    database: bitnami_keycloak
+    existingSecret: ""
+    secretKeys:
+      userPasswordKey: password
+  architecture: standalone
+# externalDatabase:
+#   host: kc-postgresql.default.svc.cluster.local
+#   port: 5433
+#   user: user
+#   database: bitnami_keycloak
+#   password: "password"
+
+# Kubernetes Service Configuration
+service:
+  type: LoadBalancer
+  ports:
+    http: 9080
+  # nodePorts:
+  #   http: 30080
+
+# Additional Keycloak Environment Variables
+# extraEnvVars:
+#   # Enable production mode to prevent thread blocking
+#   - name: KC_PRODUCTION
+#     value: "true"
+
+#   - name: KC_HOSTNAME_STRICT
+#     value: "false"
+#   - name: KC_HTTP_ENABLED
+#     value: "true"
+
+#   - name: VERTX_WORKER_POOL_SIZE
+#     value: "20"
+#   - name: VERTX_EVENT_LOOP_POOL_SIZE
+#     value: "8"
