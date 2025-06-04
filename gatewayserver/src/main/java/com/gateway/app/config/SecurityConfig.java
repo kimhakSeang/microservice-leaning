@@ -1,6 +1,8 @@
 package com.gateway.app.config;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -21,12 +23,18 @@ import reactor.core.publisher.Mono;
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
+    private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
+
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity serverHttpSecurity) {
-        serverHttpSecurity.authorizeExchange(exchanges -> exchanges.pathMatchers(HttpMethod.GET).permitAll()
-                                    .pathMatchers("/account/**").hasRole("ACCOUNT")
-                                    .pathMatchers("/card/**").hasRole("CARD")
-                                    .pathMatchers("/loan/**").hasRole("LOAN")
+        log.info(">>>>>>>>>>> Start filter chain: {}", serverHttpSecurity.headers());
+        serverHttpSecurity.authorizeExchange(exchanges ->
+                                exchanges
+//                                         .pathMatchers("account/**").permitAll()
+                                         .pathMatchers(HttpMethod.GET).permitAll()
+                                         .pathMatchers("/account/**").hasRole("ACCOUNT")
+                                         .pathMatchers("/card/**").hasRole("CARD")
+                                         .pathMatchers("/loan/**").hasRole("LOAN")
                             )
                 .oauth2ResourceServer(oAuth2ResourceServerSpec ->
                         oAuth2ResourceServerSpec.jwt( jwtSpec ->

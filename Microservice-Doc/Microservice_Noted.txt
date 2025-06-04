@@ -868,7 +868,7 @@ Week_12: Erekaserver
 	  helm install keycloak bitnami/keycloak -f helm/values.yaml
 		 
 	** TODO:
-       - Fix Postgresql with kafka, keycloak
+       - Fix kafka, keycloak
 	   
 		
 		
@@ -911,9 +911,20 @@ Week_12: Erekaserver
 	> Unti-affinity :
 	> Kubernetes manifest file:
 	> Kafka high-throughput: have ability handle high amount data and realtime process
-
-
-  > 
+    > Issue Postgresql with keycloak: 
+	  - need to overide value when deploy
+    > No SecurityContext found in WebSession: .... Authorization failed: Access Denied
+	  - Add header prefix Bearer when access oauth2
+	> Keycloak Invalid parameter: redirect_uri
+	  - enable Client authentication
+	    -> chose standard flow
+	      -> update valid rediect url in keycloak from /* to *
+    > Authentication Code: Forbiden
+	  -> Create Client
+	     -> Create Role: ACCOUNT
+		    -> Create User: kimhak
+			   -> Assign Role: ACCOUN to Kimhak
+			      -> Request Token: using username and pwd of kimhak to login
 
 
 
@@ -953,6 +964,7 @@ kubectl port-forward --namespace default svc/kafka 9092:9092 &
 > Promethues
 kubectl port-forward --namespace default svc/prometheus 9093:9093 &
 > Keycloak
+echo Username: $(kubectl get secret --namespace default keycloak -o jsonpath="{.data.admin-username}" | base64 -d)
 echo Password: $(kubectl get secret --namespace default keycloak -o jsonpath="{.data.admin-password}" | base64 -d)
 
 MONGODB_HOST:mongodb.default.svc.cluster.local

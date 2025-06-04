@@ -3,7 +3,7 @@ global:
   activeProfile: dev
   configServerURL: configserver:http://configserver:8071/
   eurekaServerURL: http://eurekaserver:9000/eureka/
-  keyCloakURL: http://keycloak.default.svc.cluster.local:80/realms/master/protocol/openid-connect/certs
+  keyCloakURL: keycloak.default.svc.cluster.local:9080/realms/master/protocol/openid-connect/certs
   openTelemetryJavaAgent: "-javaagent:/app/libs/opentelemetry-javaagent-1.27.0.jar"
   otelExporterEndPoint: http://tempo-grafana-tempo-distributor:4317
   otelMetricsExporter: none

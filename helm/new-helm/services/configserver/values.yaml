@@ -15,7 +15,7 @@ appname_enabled: true
 profile_enabled: true
 config_enabled: false
 eureka_enabled: false
-resouceserver_enabled: false
+resouceserver_enabled: true
 otel_enabled: false
 kafka_enabled: false
 postgresql_enabled: false
