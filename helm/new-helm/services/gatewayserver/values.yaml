@@ -9,12 +9,12 @@ image:
   repository: kimhakseang/gatewayserver
   tag: v3
 
-containerPort: 8072
+containerPort: 8075
 
 service:
   type: LoadBalancer
-  port: 8072
-  targetPort: 8072
+  port: 8075
+  targetPort: 8075
 
 appname_enabled: true
 profile_enabled: true
