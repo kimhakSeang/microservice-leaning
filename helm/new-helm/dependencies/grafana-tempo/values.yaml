@@ -76,6 +76,12 @@ diagnosticMode:
 ## @section Common Grafana Tempo Parameters
 ##
 tempo:
+  ingester:
+    resources:
+      limits:
+        memory: 1Gi # Or 512Mi, 2Gi depending on your needs and available node resources
+      requests:
+        memory: 512Mi # Adjust requests proportionally
   ## Bitnami Grafana Tempo image
   ## ref: https://hub.docker.com/r/bitnami/grafana-tempo/tags/
   ## @param tempo.image.registry [default: REGISTRY_NAME] Grafana Tempo image registry
